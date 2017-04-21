@@ -50,16 +50,21 @@ pair<int, int> NaiveAlgo::attack()
 void NaiveAlgo::getNextPosition(Position* position)
 {
 	int xPos = position->getX();
+	int yPos = position->getY();
 	if(xPos < m_rowCount)
 	{
 		xPos++;
 		position->setX(xPos);
 	}
-	else
+	else if(yPos < m_colCount)
 	{
-		int yPos = position->getY();
 		yPos++;
 		position->setPosition(0, yPos);
+	}
+	else
+	{
+		position->setPosition(-2, -2);
+		return;
 	}
 	
 	if(!isPositionOk(position))
