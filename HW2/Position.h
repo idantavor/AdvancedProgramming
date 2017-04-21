@@ -9,6 +9,9 @@ public:
 	Position(int, int);
 	int getX() const;
 	int getY() const;
+	void setX(int x);
+	void setY(int y);
+	void setPosition(int x, int y);
 	bool isAlive;
 	friend bool operator== (const Position p1, const Position p2);
 };

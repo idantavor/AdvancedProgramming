@@ -25,3 +25,19 @@ int Position::getY() const
 {
 	return y_coord;
 }
+
+void Position::setX(int x)
+{
+	x_coord = x;
+}
+
+void Position::setY(int y)
+{
+	y_coord = y;
+}
+
+void Position::setPosition(int x, int y)
+{
+	setX(x);
+	setY(y);
+}

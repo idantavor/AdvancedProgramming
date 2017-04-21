@@ -53,7 +53,8 @@ class BattleManager {
 		void shipCollectChars(int x, int y, char shipChar, bool** visitBoard, list<Position>* positionList) const;
 		bool validateFilesExistance(const std::string& dirPath = "");
 		bool runBattle(const string& dirPath);
-		bool isSpacesAreOK(int, int, char) const;
+	void buildUserBoards(char** boardA, char** boardB) const;
+	bool isSpacesAreOK(int, int, char) const;
 		bool checkSpacesInPosition(int x, int y, char c) const;
 		bool checkSpacesDiagnol(int x, int y) const;
 		bool checkSpacesInPositionDiagnol(int x, int y) const;

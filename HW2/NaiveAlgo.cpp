@@ -4,10 +4,92 @@
 
 void NaiveAlgo::notifyOnAttackResult(int player, int row, int col, AttackResult result)
 {
-	
+	//currently nothing to do with it..
+}
+
+NaiveAlgo::NaiveAlgo(){
+	currentPosition = new Position(0, 0);
+}
+
+NaiveAlgo::~NaiveAlgo()
+{
+	delete currentPosition;
+}
+
+bool NaiveAlgo::init(const std::string& path)
+{
+	//TODO
+	return true;
 }
 
 void NaiveAlgo::setBoard(int player, const char** board, int numRows, int numCols)
 {
-	userFleet = Utility::setUserFleetFromBoard(board, numRows, numCols);
+	m_board = new char*[numRows];
+	for(int i=0; i< numRows; i++)
+	{
+		m_board[i] = new char[numCols];
+		for(int j=0; j< numCols; j++)
+		{
+			m_board[i][j] = board[i][j];
+		}
+	}
+	//userFleet = Utility::setUserFleetFromBoard(board, numRows, numCols);
+}
+
+pair<int, int> NaiveAlgo::attack()
+{
+	if(firstPos)
+	{
+		firstPos = false;
+		return pair<int, int>(currentPosition->getX() + 1, currentPosition->getY() + 1);
+	}
+	getNextPosition(currentPosition);
+	return pair<int,int>(currentPosition->getX()+1, currentPosition->getY()+1);
+}
+
+void NaiveAlgo::getNextPosition(Position* position)
+{
+	int xPos = position->getX();
+	if(xPos < m_rowCount)
+	{
+		xPos++;
+		position->setX(xPos);
+	}
+	else
+	{
+		int yPos = position->getY();
+		yPos++;
+		position->setPosition(0, yPos);
+	}
+	
+	if(!isPositionOk(position))
+	{
+		getNextPosition(position);
+	}
+}
+
+bool NaiveAlgo::isPositionOk(Position* position)
+{
+	if(m_board[position->getX()][position->getY()] != ' ')
+	{
+		return false;
+	}
+	if (position->getX() > 0 && m_board[position->getX()-1][position->getY()] != ' ')
+	{
+		return false;
+	}
+	if (position->getX() < m_rowCount-1 && m_board[position->getX() + 1][position->getY()] != ' ')
+	{
+		return false;
+	}
+	if (position->getY() > 0 && m_board[position->getX()][position->getY()-1] != ' ')
+	{
+		return false;
+	}
+	if (position->getY() < m_colCount - 1 && m_board[position->getX()][position->getY()+1] != ' ')
+	{
+		return false;
+	}
+
+	return true;
 }
