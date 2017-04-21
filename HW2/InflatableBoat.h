@@ -28,8 +28,4 @@ class InflatableBoat: public Ship
 		static int score;
 };
 
-char InflatableBoat::symbolAPlayer = 'B';
-char InflatableBoat::symbolBPlayer = 'b';
-int InflatableBoat::length = 1;
-int InflatableBoat::score = 2;
 

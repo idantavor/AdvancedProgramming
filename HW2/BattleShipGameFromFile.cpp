@@ -16,9 +16,15 @@ BattleShipGameFromFile::~BattleShipGameFromFile() {
 	m_attackFileIFS.close();
 }
 
-void BattleShipGameFromFile::setBoard(const char** board, int numRows, int numCols) {
+bool BattleShipGameFromFile::init(const std::string & path)
+{
+	return false;
+}
+
+void BattleShipGameFromFile::setBoard(int player, const char** board, int numRows, int numCols) {
 	m_rowCount = numRows;
 	m_colCount = numCols;
+	m_player = player;
 }
 
 void BattleShipGameFromFile::notifyOnAttackResult(int player, int row, int col, AttackResult result) {

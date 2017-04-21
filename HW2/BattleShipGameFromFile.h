@@ -20,12 +20,14 @@ class BattleShipGameFromFile: public IBattleshipGameAlgo {
 public:
 	BattleShipGameFromFile(const string& attackFilePath);
 	~BattleShipGameFromFile();
-	void setBoard(const char** board, int numRows, int numCols); // called once to notify player on his board
-	std::pair<int, int> attack(); // ask player for his move retruns <row,col>, <-1,-1> if no valid attack is found
-	void notifyOnAttackResult(int player, int row, int col, AttackResult result); // notify on last move result
+	virtual bool init(const std::string& path) override;
+	virtual void setBoard(int player, const char** board, int numRows, int numCols) override; // called once to notify player on his board
+	std::pair<int, int> attack() override; // ask player for his move retruns <row,col>, <-1,-1> if no valid attack is found
+	void notifyOnAttackResult(int player, int row, int col, AttackResult result) override; // notify on last move result
 private :
 	std::ifstream m_attackFileIFS;
 	std::pair<int, int> parseLine(const string& line); // parses a line, returns <row,col> upon suceess ,<-1,-1> upon failure
 	int m_rowCount;
 	int m_colCount;
+	int m_player;
 };
