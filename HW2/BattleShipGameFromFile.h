@@ -18,10 +18,12 @@ using namespace std;
 
 class BattleShipGameFromFile: public IBattleshipGameAlgo {
 public:
-	BattleShipGameFromFile(const string& attackFilePath);
+	BattleShipGameFromFile();
 	~BattleShipGameFromFile();
 	virtual bool init(const std::string& path) override;
 	virtual void setBoard(int player, const char** board, int numRows, int numCols) override; // called once to notify player on his board
+	static void getFileNamesFromDir(std::vector<string>& out, const string& directory);
+	static bool has_suffix(const std::string& str, const std::string& suffix);
 	std::pair<int, int> attack() override; // ask player for his move retruns <row,col>, <-1,-1> if no valid attack is found
 	void notifyOnAttackResult(int player, int row, int col, AttackResult result) override; // notify on last move result
 private :

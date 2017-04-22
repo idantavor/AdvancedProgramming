@@ -9,8 +9,8 @@
 #include <vector>
 #include <direct.h>
 #define BOARD_PATH 0
-#define ATTACK_A_PATH 1
-#define ATTACK_B_PATH 2
+#define DLL_A_PATH 1
+#define DLL_B_PATH 2
 #define A_TURN 0
 #define B_TURN 1
 #define NUMBR_OF_SHIPS 5
@@ -46,18 +46,17 @@ class BattleManager {
 			this->boardSize = boardSize;
 			board = new string[boardSize+1];
 		}
-		bool loadBoard(const string& boardPath) const;
+
+	void loadBoard(const string& boardPath) const;
 		bool validateBoard();
 		void buildShip(int x, int y, char shipChar, bool** visitBoard, list<Ship*>* shipsListA,
-			list<Ship*>* shipsListB, list<char>* failedCharA, list<char>* failedCharB);
+			list<Ship*>* shipsListB, list<char>* failedCharA, list<char>* failedCharB) const;
 		void shipCollectChars(int x, int y, char shipChar, bool** visitBoard, list<Position>* positionList) const;
-		bool validateFilesExistance(const std::string& dirPath = "");
+	bool validateFilesExistanceAndBoardValidate(const std::string& dirPath = "");
 		bool runBattle(const string& dirPath);
 	void buildUserBoards(char** boardA, char** boardB) const;
 	bool isSpacesAreOK(int, int, char) const;
 		bool checkSpacesInPosition(int x, int y, char c) const;
-		bool checkSpacesDiagnol(int x, int y) const;
-		bool checkSpacesInPositionDiagnol(int x, int y) const;
 };
 
 

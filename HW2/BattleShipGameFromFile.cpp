@@ -1,14 +1,9 @@
 #include "BattleShipGameFromFile.h"
+#include "dirent.h"
 
 
-//C'tor
-BattleShipGameFromFile::BattleShipGameFromFile(const string& attackFilePath) {
-	//here the attachFilePath should exist
-	m_attackFileIFS = ifstream(attackFilePath);
-	if (!m_attackFileIFS.is_open()) {
-		cout << "failed to open attack file " << attackFilePath;
-		throw exception("fatal error, failed to open attack file");
-	}
+BattleShipGameFromFile::BattleShipGameFromFile()
+{
 }
 
 //D'tor
@@ -18,13 +13,76 @@ BattleShipGameFromFile::~BattleShipGameFromFile() {
 
 bool BattleShipGameFromFile::init(const std::string & path)
 {
-	return false;
+
+	//get file names in dir path
+	vector<string> fileNames;
+	string searchIn;
+
+	//check if dirPath provided
+	if (path.empty()) {
+		searchIn = ".";
+	}
+	else {
+		searchIn = path;
+	}
+	getFileNamesFromDir(fileNames, searchIn);
+	vector<string> attackFiles;
+
+	for (unsigned int i = 0; i < fileNames.size(); i++) {
+		if (has_suffix(fileNames[i], "attack")) {
+			attackFiles.push_back(fileNames[i]);
+		}
+	}
+
+	if(attackFiles.size() == 0)
+	{
+		return false;
+	}
+
+	string attackPath;
+	if(attackFiles.size() == 1)
+	{
+		attackPath = path + '\\' + attackFiles[m_player];
+	}
+	else
+	{
+		sort(attackFiles.begin(), attackFiles.end());
+		attackPath = path + '\\' + attackFiles[m_player];
+	}
+	//here the attachFilePath should exist
+	m_attackFileIFS = ifstream(attackPath);
+	if (!m_attackFileIFS.is_open()) {
+		return false;
+		/*cout << "failed to open attack file " << path;
+		throw exception("fatal error, failed to open attack file");*/
+	}
+
+	return true;
 }
 
 void BattleShipGameFromFile::setBoard(int player, const char** board, int numRows, int numCols) {
 	m_rowCount = numRows;
 	m_colCount = numCols;
 	m_player = player;
+}
+
+void  BattleShipGameFromFile :: getFileNamesFromDir(std::vector<string> &out, const string &directory) {
+	DIR *dpdf;
+	struct dirent *epdf;
+	dpdf = opendir(directory.c_str());
+	if (dpdf != NULL) {
+		while (epdf = readdir(dpdf)) {
+			if (string(epdf->d_name) == "." || string(epdf->d_name) == "..")continue;
+			out.push_back(epdf->d_name);
+		}
+		closedir(dpdf);
+	}
+}
+
+bool BattleShipGameFromFile::has_suffix(const std::string &str, const std::string &suffix)
+{
+	return str.size() >= suffix.size() &&
+		str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
 void BattleShipGameFromFile::notifyOnAttackResult(int player, int row, int col, AttackResult result) {

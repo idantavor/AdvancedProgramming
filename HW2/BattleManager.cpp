@@ -12,6 +12,7 @@
 #include "battleship.h"
 #include "submarine.h"
 #include "missileBoat.h"
+#include "NaiveAlgo.h"
 
 
 bool dirExists(const std::string& dirName_in)
@@ -31,7 +32,7 @@ bool has_suffix(const std::string &str, const std::string &suffix)
 		str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-bool BattleManager::loadBoard(const string& boardPath) const
+void BattleManager::loadBoard(const string& boardPath) const
 {
 
 	ifstream borderFile(boardPath);
@@ -93,7 +94,6 @@ bool BattleManager::loadBoard(const string& boardPath) const
 		}
 	}
 	borderFile.close();
-	return true;
 }
 
 bool BattleManager::isKnownLetter(char c){
@@ -219,7 +219,7 @@ bool BattleManager::validateBoard()
 }
 
 void BattleManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list<Ship*>* shipsListA,
-	list<Ship*>* shipsListB, list<char>* failedCharA, list<char>* failedCharB)
+	list<Ship*>* shipsListB, list<char>* failedCharA, list<char>* failedCharB) const
 {
 
 	if (shipChar == InflatableBoat::symbolAPlayer)
@@ -397,11 +397,13 @@ void BattleManager::shipCollectChars(int x, int y, char shipChar, bool** visitBo
 		shipCollectChars(x, y_i, shipChar, visitBoard, positionList);
 	}
 }
-bool BattleManager::validateFilesExistance(const std::string& dirPath) {
-	vector<string> suffixes = { "sboard","attack-a","attack-b" }; // file suffixes to validate
-	vector<string> errors = { "Missing board file (*.sboard) looking in path: ","Missing attack file for player A (*.attack-a) looking in path: ","Missing attack file for player B (*.attack-b) looking in path: " };
-	vector<bool> isSuffixesFound(suffixes.size(),false);
-	filePaths = vector<string>(suffixes.size(), "");
+bool BattleManager::validateFilesExistanceAndBoardValidate(const std::string& dirPath) {
+	vector<string> suffixes = { "sboard", "dll" }; // file suffixes to validate
+	vector<string> errors = { "Missing board file (*.sboard) looking in path: ", "Missing an algorithm (dll) file looking in path: " };
+	vector<string> dllFiels;
+	bool isBoardFound = false;
+	bool validBoard = false;
+	filePaths = vector<string>(3, "");
 	bool isFileNotFound = false;
 	string searchIn;
 	
@@ -415,7 +417,7 @@ bool BattleManager::validateFilesExistance(const std::string& dirPath) {
 	
 	//if dirPath provided check if dir exists
 	if (searchIn != "." && !dirExists(searchIn)) {
-		std::cout << "Wrong path : " << searchIn << endl;
+		cout << "Wrong path : " << searchIn << endl;
 		return false;
 	}
 	
@@ -423,25 +425,39 @@ bool BattleManager::validateFilesExistance(const std::string& dirPath) {
 	vector<string> fileNames;
 	getFileNamesFromDir(fileNames, searchIn);
 
-	//validate files with suffix exists
 	for (unsigned int i = 0; i < fileNames.size(); i++) {
-		if (suffixes.size() == 0) break;
-		for (unsigned int j = 0; j < suffixes.size(); j++) {
-			if (isSuffixesFound[j])continue; //if a file with suffix already found dont overwrite it
-			if (has_suffix(fileNames[i], suffixes[j])) {
-				filePaths[j] = searchIn + '\\' + fileNames[i];
-				isSuffixesFound[j] = true;
-				break;
-			}
+		if (has_suffix(fileNames[i], suffixes[BOARD_PATH])) {
+			filePaths[BOARD_PATH] = searchIn + '\\' + fileNames[i];
+			isBoardFound = true;
+		}
+		if (has_suffix(fileNames[i], suffixes[1])) {
+			dllFiels.push_back(fileNames[i]);
 		}
 	}
-	for (unsigned int j = 0; j < isSuffixesFound.size(); j++) {
-		if (!isSuffixesFound[j]) {
-			cout << errors[j] << searchIn << endl;
-			isFileNotFound = true;
-		}
+
+	if(!isBoardFound)
+	{
+		cout << errors[BOARD_PATH] << searchIn << endl;
+		isFileNotFound = true;
 	}
-	if (isFileNotFound)return false; // file not found
+	else
+	{
+		loadBoard(filePaths[BOARD_PATH]); //load and 
+		validBoard = validateBoard(); //validate the board
+	}
+
+	if(dllFiels.size() <2 ){
+		cout << errors[DLL_A_PATH] << searchIn << endl;
+		isFileNotFound = true;
+	}
+	else
+	{
+		sort(dllFiels.begin(), dllFiels.end());
+		filePaths[DLL_A_PATH] = searchIn + '\\' + fileNames[0];
+		filePaths[DLL_B_PATH] = searchIn + '\\' + fileNames[1];
+	}
+
+	if (isFileNotFound || !validBoard)return false; // file not found
 	
 	return true;
 	
@@ -452,13 +468,12 @@ bool BattleManager::validateFilesExistance(const std::string& dirPath) {
 bool BattleManager::runBattle(const string & dirPath)
 {
 	int currentTurn = 0;// A turn when 0 , B turn when 1;
-	if(!validateFilesExistance(dirPath))return false; //validate all input files existanc
-	if (!loadBoard(filePaths[BOARD_PATH]))return false; //load and 
-	if (!validateBoard())return false; //validate the board
+	if(!validateFilesExistanceAndBoardValidate(dirPath))return false; //validate all input files existanc and board validate
 	try {
 		// initialize the players
-		playerA = new BattleShipGameFromFile(filePaths[ATTACK_A_PATH]); 
-		playerB = new BattleShipGameFromFile(filePaths[ATTACK_B_PATH]);
+		//TODO take from dll
+		playerA = new NaiveAlgo();
+		playerB = new NaiveAlgo();
 	}
 	catch (exception e) {
 		cout << "ERROR: initing players"  << endl;
@@ -476,6 +491,11 @@ bool BattleManager::runBattle(const string & dirPath)
 	//free the tmp board, no need to free the char* generated by c_str(), as it points too the string which will manage it's own lifetime
 	delete[] boardAchar;
 	delete[] boardBchar;
+
+	if(!playerA->init(dirPath) || !playerB->init(dirPath))
+	{
+		return false;
+	}
 																		 
 	//init player's status
 	bool playerAFin = false; bool playerBFin = false;
@@ -606,22 +626,6 @@ bool BattleManager::isSpacesAreOK(int i, int j, char c) const
 bool BattleManager::checkSpacesInPosition(int x, int y, char c) const
 {
 	if (x > 0 && y > 0 && x < boardSize && y < boardSize && board[x][y] != c && board[x][y] != ' ') {
-		return false;
-	}
-	return true;
-}
-
-bool BattleManager::checkSpacesDiagnol(int x, int y) const
-{
-	return (checkSpacesInPositionDiagnol(x - 1, y - 1) &&
-		checkSpacesInPositionDiagnol(x + 1, y - 1) &&
-		checkSpacesInPositionDiagnol(x - 1, y + 1) &&
-		checkSpacesInPositionDiagnol(x + 1, y + 1));
-}
-
-bool BattleManager::checkSpacesInPositionDiagnol(int x, int y) const
-{
-	if (x > 0 && y > 0 && x < boardSize && y < boardSize && board[x][y] != ' ') {
 		return false;
 	}
 	return true;
