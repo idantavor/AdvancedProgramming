@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <direct.h>
+#include "ConsolePrinter.h"
 #define BOARD_PATH 0
 #define ATTACK_A_PATH 1
 #define ATTACK_B_PATH 2
@@ -32,6 +33,7 @@ class BattleManager {
 		UserFleet* fleetB=nullptr;
 		string* board;
 		int boardSize;
+		ConsolePrinter cp;
 		static bool isKnownLetter(char c);
 
 	public:

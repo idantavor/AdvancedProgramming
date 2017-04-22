@@ -455,6 +455,8 @@ bool BattleManager::runBattle(const string & dirPath)
 	if(!validateFilesExistance(dirPath))return false; //validate all input files existanc
 	if (!loadBoard(filePaths[BOARD_PATH]))return false; //load and 
 	if (!validateBoard())return false; //validate the board
+	this->cp.setBoard(this->board, this->boardSize);//set console printer board
+	if (!quiet)cp.print_borad();//print board if not quiet
 	try {
 		// initialize the players
 		playerA = new BattleShipGameFromFile(filePaths[ATTACK_A_PATH]); 
@@ -544,6 +546,7 @@ bool BattleManager::runBattle(const string & dirPath)
 		}
 		playerA->notifyOnAttackResult(currentTurn, currAttack.first, currAttack.second, unifiedRes); //notify A
 		playerB->notifyOnAttackResult(currentTurn, currAttack.first, currAttack.second, unifiedRes); //notify B
+		if (!quiet)cp.print_attack(posToAttack, currentTurn, unifiedRes);//print attack to console if not quiet
 		//check game status and report accordingly
 		if (!fleetA->isNotLose()) { // a lost meaning b won
 			printFinishMsg(playerAScore, playerBScore, B_TURN);
