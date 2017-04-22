@@ -455,6 +455,10 @@ bool BattleManager::runBattle(const string & dirPath)
 	if(!validateFilesExistance(dirPath))return false; //validate all input files existanc
 	if (!loadBoard(filePaths[BOARD_PATH]))return false; //load and 
 	if (!validateBoard())return false; //validate the board
+	
+	//ConsolePrinter code
+	cp.setBoard(board, boardSize);
+	cp.print_borad();
 	//create tmp char** from board to pass to function
 	const char** boardAsCharMat = new const char*[this->boardSize];
 	for (int i = 0; i < this->boardSize; i++) {
@@ -543,6 +547,11 @@ bool BattleManager::runBattle(const string & dirPath)
 		}
 		playerA->notifyOnAttackResult(currentTurn, currAttack.first, currAttack.second, unifiedRes); //notify A
 		playerB->notifyOnAttackResult(currentTurn, currAttack.first, currAttack.second, unifiedRes); //notify B
+		cp.move_cursor_to_end();
+		
+		if (currentTurn == A_TURN)cout<<"A attacks";
+		else cout << "B Attacks";
+		cp.print_attack(posToAttack, currentTurn, unifiedRes);
 		//check game status and report accordingly
 		if (!fleetA->isNotLose()) { // a lost meaning b won
 			printFinishMsg(playerAScore, playerBScore, B_TURN);

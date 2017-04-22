@@ -469,6 +469,8 @@ bool BattleManager::runBattle(const string & dirPath)
 {
 	int currentTurn = 0;// A turn when 0 , B turn when 1;
 	if(!validateFilesExistanceAndBoardValidate(dirPath))return false; //validate all input files existanc and board validate
+	this->cp.setBoard(this->board, this->boardSize);//set console printer board
+	if (!quiet)cp.print_borad();//print board if not quiet
 	try {
 		// initialize the players
 		//TODO take from dll
@@ -564,6 +566,7 @@ bool BattleManager::runBattle(const string & dirPath)
 		}
 		playerA->notifyOnAttackResult(currentTurn, currAttack.first, currAttack.second, unifiedRes); //notify A
 		playerB->notifyOnAttackResult(currentTurn, currAttack.first, currAttack.second, unifiedRes); //notify B
+		if (!quiet)cp.print_attack(posToAttack, currentTurn, unifiedRes);//print attack to console if not quiet
 		//check game status and report accordingly
 		if (!fleetA->isNotLose()) { // a lost meaning b won
 			printFinishMsg(playerAScore, playerBScore, B_TURN);

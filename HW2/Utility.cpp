@@ -111,3 +111,32 @@ void Utility::collectShipChars(const char** board, int x, int y, char shipChar, 
 		collectShipChars(board, x, y_i, shipChar, visitBoard, positionList, numRows, numCols);
 	}
 }
+
+pair<bool, string> Utility::getCommandLineArg(const string arg_to_find, int argc, char * argv[])
+{
+	auto result = pair<bool,string>(false, "");
+	for (int i = 1; i < argc; i++) {
+		string arg = argv[i];
+		if ( arg == "-" + arg_to_find) {
+			result.first = true;
+			if (i + 1 >= argc) {
+				return result;
+			}
+			string val = argv[i + 1];
+			if (val.length() == 0) {
+				return result;
+			}
+			else {
+				if (val[0] == '-')return result;
+				else {
+					result.second = val;
+					return result;
+				}
+			}
+			
+		}
+	}
+	return result;
+}
+
+

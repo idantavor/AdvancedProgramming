@@ -5,8 +5,10 @@
 #include "BattleShipGameFromFile.h"
 #include <iostream>
 #include <cstdio>
+#include "ConsolePrinter.h"
 int main(int argc, char* argv[])
 {	
+	
 	string path;
 	if (argc > 1) {
 		path = argv[1];
