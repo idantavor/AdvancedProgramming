@@ -502,7 +502,7 @@ bool BattleManager::runBattle(const string & dirPath)
 	//TODO load dll2
 	try {
 		// initialize the players
-		playerA = new NaiveAlgo();
+		playerB = new NaiveAlgo();
 	}
 	catch (exception e) {
 		cout << "ERROR: initing player B" << endl;

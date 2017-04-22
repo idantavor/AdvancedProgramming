@@ -24,6 +24,9 @@ bool NaiveAlgo::init(const std::string& path)
 
 void NaiveAlgo::setBoard(int player, const char** board, int numRows, int numCols)
 {
+	m_player = player;
+	m_rowCount = numRows;
+	m_colCount = numCols;
 	m_board = new char*[numRows];
 	for(int i=0; i< numRows; i++)
 	{
@@ -51,15 +54,15 @@ void NaiveAlgo::getNextPosition(Position* position)
 {
 	int xPos = position->getX();
 	int yPos = position->getY();
-	if(xPos < m_rowCount)
-	{
-		xPos++;
-		position->setX(xPos);
-	}
-	else if(yPos < m_colCount)
+	if(yPos < m_rowCount)
 	{
 		yPos++;
-		position->setPosition(0, yPos);
+		position->setY(yPos);
+	}
+	else if(xPos < m_colCount)
+	{
+		xPos++;
+		position->setPosition(xPos, 0);
 	}
 	else
 	{
