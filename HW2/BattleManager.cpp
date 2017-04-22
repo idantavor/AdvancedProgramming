@@ -478,7 +478,8 @@ bool BattleManager::runBattle(const string & dirPath)
 	//TODO take from dll
 	try {
 		// initialize the player A
-		playerA = new NaiveAlgo();
+		//playerA = new NaiveAlgo();
+		playerA = new BattleShipGameFromFile();
 	}
 	catch (exception e) {
 		cout << "ERROR: initing player A" << endl;
@@ -502,7 +503,8 @@ bool BattleManager::runBattle(const string & dirPath)
 	//TODO load dll2
 	try {
 		// initialize the players
-		playerB = new NaiveAlgo();
+		//playerB = new NaiveAlgo();
+		playerB = new BattleShipGameFromFile();
 	}
 	catch (exception e) {
 		cout << "ERROR: initing player B" << endl;

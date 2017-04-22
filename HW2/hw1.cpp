@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 	auto result = Utility::getCommandLineArg("quiet", argc, argv); //get quiet param
 	bool quiet = result.first;
 
-	result=Utility::getCommandLineArg("dealy", argc, argv);//get delay param
+	result=Utility::getCommandLineArg("delay", argc, argv);//get delay param
 	if (result.first) {
 		if (result.second != "") {
 			try {
