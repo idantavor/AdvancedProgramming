@@ -1,0 +1,12 @@
+main compilation reqiures the following cpp and header files:
+-BattleManager
+-battleship
+-ConsolePrinter
+-dirent.h
+-IBattleShipGameAlgo
+-missileBoat
+-Position
+-Ship
+-submarine
+-UserFleet
+-Utility
