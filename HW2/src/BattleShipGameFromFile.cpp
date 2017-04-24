@@ -42,7 +42,7 @@ bool BattleShipGameFromFile::init(const std::string & path)
 	string attackPath;
 	if(attackFiles.size() == 1)
 	{
-		attackPath = searchIn + '\\' + attackFiles[m_player];
+		attackPath = searchIn + '\\' + attackFiles[0];
 	}
 	else
 	{

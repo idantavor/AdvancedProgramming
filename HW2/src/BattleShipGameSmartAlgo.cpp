@@ -1,5 +1,5 @@
 #include "BattleShipGameSmartAlgo.h"
-
+#include "IBattleshipGameAlgo.h"
 
 //C'tor
 BattleShipGameSmartAlgo::BattleShipGameSmartAlgo() {
@@ -326,5 +326,7 @@ bool BattleShipGameSmartAlgo::areShipsAdjacent(const set<std::pair<int, int>>& s
 	return false;
 }
 
-
+IBattleshipGameAlgo* GetAlgorithm() {
+	return new BattleShipGameSmartAlgo();
+};
 
