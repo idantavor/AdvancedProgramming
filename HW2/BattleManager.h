@@ -32,6 +32,7 @@ class BattleManager {
 		UserFleet* fleetA=nullptr;
 		UserFleet* fleetB=nullptr;
 		string* board;
+		IBattleshipGameAlgo* loadFromDLL(string path);
 		int boardSize;
 		bool quiet;
 		static bool isKnownLetter(char c);

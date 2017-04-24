@@ -1,5 +1,5 @@
 #include "NaiveAlgo.h"
-#include "Utility.h"
+
 
 
 void NaiveAlgo::notifyOnAttackResult(int player, int row, int col, AttackResult result)
@@ -101,3 +101,7 @@ bool NaiveAlgo::isPositionOk(Position* position)
 
 	return true;
 }
+
+IBattleshipGameAlgo* GetAlgorithm() {
+	return new NaiveAlgo();
+};

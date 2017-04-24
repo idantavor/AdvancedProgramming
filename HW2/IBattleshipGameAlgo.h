@@ -23,4 +23,4 @@ public:
 	#define ALGO_API extern "C" __declspec(dllimport)	// If someone else includes this .h - import
 #endif
 
-//ALGO_API IBattleshipGameAlgo* GetAlgorithm();			// This method must be implemented in each player(algorithm) .cpp file
+ALGO_API IBattleshipGameAlgo* GetAlgorithm();			// This method must be implemented in each player(algorithm) .cpp file

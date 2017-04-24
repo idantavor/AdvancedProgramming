@@ -4,6 +4,9 @@
 #include <fstream>
 #include <windows.h>
 #include <iostream>
+#include <winapifamily.h>
+#include <functional>
+#include <memory>
 #include <vector>
 #include "dirent.h"
 #include "Ship.h"
@@ -94,6 +97,34 @@ void BattleManager::loadBoard(const string& boardPath) const
 		}
 	}
 	borderFile.close();
+}
+
+IBattleshipGameAlgo* BattleManager::loadFromDLL(string path)
+{	
+	UINT oldMode = SetErrorMode(0);
+	SetErrorMode(oldMode | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
+		IBattleshipGameAlgo * instance = NULL;
+		HINSTANCE hDll;
+		try {
+		// Load dynamic library 
+		hDll = LoadLibrary(path.c_str());
+		using FunctionPtr = IBattleshipGameAlgo* (*) ();
+		if (hDll)
+		{
+			// GetAlgorithm function
+			auto GetAlgorithm = reinterpret_cast<FunctionPtr>(GetProcAddress(hDll, "GetAlgorithm"));
+			instance = GetAlgorithm();
+		}
+		else {
+			instance = NULL;
+			throw exception("failed to load library");
+		}
+	}
+	catch (exception e) {
+		throw e;
+	}
+	
+	return instance;
 }
 
 bool BattleManager::isKnownLetter(char c){
@@ -477,9 +508,11 @@ bool BattleManager::runBattle(const string & dirPath)
 	
 	//TODO take from dll
 	try {
+
 		// initialize the player A
 		//playerA = new NaiveAlgo();
-		playerA = new BattleShipGameFromFile();
+		playerA = loadFromDLL(filePaths[DLL_A_PATH]);
+		//playerA = new BattleShipGameFromFile();
 	}
 	catch (exception e) {
 		cout << "ERROR: initing player A" << endl;
@@ -503,8 +536,8 @@ bool BattleManager::runBattle(const string & dirPath)
 	//TODO load dll2
 	try {
 		// initialize the players
-		//playerB = new NaiveAlgo();
-		playerB = new BattleShipGameFromFile();
+		playerB = loadFromDLL(filePaths[DLL_B_PATH]);
+		//playerB = new BattleShipGameFromFile();
 	}
 	catch (exception e) {
 		cout << "ERROR: initing player B" << endl;
@@ -536,26 +569,10 @@ bool BattleManager::runBattle(const string & dirPath)
 			currentTurn = (currentTurn + 1) % 2; 
 			continue;
 		}
-		//execute attack and get result
-		if (currentTurn == A_TURN) {
-			if (currAttack.first == 10) {
-
-			}
-		}
 		Position posToAttack = Position(currAttack.first - 1, currAttack.second - 1);
 		auto result = (currentTurn == A_TURN) ? fleetB->executeAttack(posToAttack) : fleetA->executeAttack(posToAttack);
 		auto selfResult = (currentTurn == A_TURN) ? fleetA->executeAttack(posToAttack) : fleetB->executeAttack(posToAttack);
-		//std::pair<AttackResult, Ship*> result;
-		//std::pair<AttackResult, Ship*> selfResult;
-		//if (currentTurn == A_TURN) {
-		//	result = fleetB->executeAttack(posToAttack);
-		//	selfResult = fleetA->executeAttack(posToAttack);
-		//}
-		//else {
-		//	selfResult = fleetB->executeAttack(posToAttack);
-		//	result = fleetA->executeAttack(posToAttack);
-		//}
-
+	
 		AttackResult unifiedRes = AttackResult::Miss;
 		bool shouldSwitchTurn = false;
 		switch (result.first) {

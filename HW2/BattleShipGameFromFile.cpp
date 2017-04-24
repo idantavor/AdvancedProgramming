@@ -134,4 +134,7 @@ std::pair<int, int> BattleShipGameFromFile::parseLine(const string& line) {
 	return std::pair<int, int>(row,col);
 }
 
+IBattleshipGameAlgo* GetAlgorithm() {
+	return new BattleShipGameFromFile();
+}
 

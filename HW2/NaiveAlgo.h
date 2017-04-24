@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+#include "Utility.h"
 #include "UserFleet.h"
 
 using namespace std;
