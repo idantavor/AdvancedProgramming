@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 	if (result.first) {
 		if (result.second != "") {
 			try {
-				delay = atoi(result.second.c_str()) * 1000;
+				delay = (int)(stod(result.second.c_str()) * 1000);
 			}
 			catch (exception) {
 				

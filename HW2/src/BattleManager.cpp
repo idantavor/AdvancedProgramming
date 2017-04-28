@@ -107,7 +107,7 @@ IBattleshipGameAlgo* BattleManager::loadFromDLL(string path)
 		HINSTANCE hDll;
 		try {
 		// Load dynamic library 
-		hDll = LoadLibrary(path.c_str());
+		hDll = LoadLibraryA(path.c_str());
 		using FunctionPtr = IBattleshipGameAlgo* (*) ();
 		if (hDll)
 		{
