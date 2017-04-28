@@ -484,8 +484,8 @@ bool BattleManager::validateFilesExistanceAndBoardValidate(const std::string& di
 	else
 	{
 		sort(dllFiels.begin(), dllFiels.end());
-		filePaths[DLL_A_PATH] = searchIn + '\\' + fileNames[0];
-		filePaths[DLL_B_PATH] = searchIn + '\\' + fileNames[1];
+		filePaths[DLL_A_PATH] = searchIn + '\\' + dllFiels[0];
+		filePaths[DLL_B_PATH] = searchIn + '\\' + dllFiels[1];
 	}
 
 	if (isFileNotFound || !validBoard)return false; // file not found
