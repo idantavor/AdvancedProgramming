@@ -58,6 +58,7 @@ class BattleManager {
 	bool validateFilesExistanceAndBoardValidate(const std::string& dirPath = "");
 	bool runBattle(const string& dirPath);
 	void buildUserBoards(char** boardA, char** boardB) const;
+	void deleteBoard(char** boardToDelete) const;
 	bool isSpacesAreOK(int, int, char) const;
 	bool checkSpacesInPosition(int x, int y, char c) const;
 };

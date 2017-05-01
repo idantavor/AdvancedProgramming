@@ -7,6 +7,14 @@ void NaiveAlgo::notifyOnAttackResult(int player, int row, int col, AttackResult 
 	//currently nothing to do with it..
 }
 
+NaiveAlgo::~NaiveAlgo()
+{
+	for (int i = 0; i < m_rowCount; i++) {
+		delete[] m_board[i];
+	}
+	delete[] m_board;
+}
+
 bool NaiveAlgo::init(const std::string& path)
 {
 	//TODO

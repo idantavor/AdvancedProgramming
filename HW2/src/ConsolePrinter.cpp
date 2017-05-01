@@ -35,7 +35,8 @@ int ConsolePrinter::wherey()
 	return csbi.dwCursorPosition.Y;
 }
 
-void ConsolePrinter::setcursor(bool visible, DWORD size) // set bool visible = 0 - invisible, bool visible = 1 - visible
+void ConsolePrinter::setcursor(bool visible, DWORD size) const
+// set bool visible = 0 - invisible, bool visible = 1 - visible
 {
 	if (size == 0)
 	{
@@ -47,7 +48,7 @@ void ConsolePrinter::setcursor(bool visible, DWORD size) // set bool visible = 0
 	SetConsoleCursorInfo(console, &lpCursor);
 }
 
-int ConsolePrinter::get_color_by_char(char c)
+int ConsolePrinter::get_color_by_char(char c) const
 {
 	if (c == ' ')return BASE_TEXT_COLOR;
 	if (isupper(c))return SHIP_COLOR_PLAYER_A;

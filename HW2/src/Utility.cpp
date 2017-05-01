@@ -34,8 +34,8 @@ void  Utility::getFileNamesFromDir(std::vector<string> &out, const string &direc
 	DIR *dpdf;
 	struct dirent *epdf;
 	dpdf = opendir(directory.c_str());
-	if (dpdf != NULL) {
-		while (epdf = readdir(dpdf)) {
+	if (dpdf != nullptr) {
+		while ((epdf = readdir(dpdf))) {
 			if (string(epdf->d_name) == "." || string(epdf->d_name) == "..")continue;
 			out.push_back(epdf->d_name);
 		}

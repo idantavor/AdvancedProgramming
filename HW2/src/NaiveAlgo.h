@@ -11,7 +11,7 @@ using namespace std;
 class NaiveAlgo : public IBattleshipGameAlgo {
 public:
 	NaiveAlgo()=default;
-	~NaiveAlgo()=default;
+	~NaiveAlgo();
 	bool init(const std::string& path) override;
 	void setBoard(int player, const char** board, int numRows, int numCols) override; // called once to notify player on his board
 	pair<int, int> attack() override; // ask player for his move retruns <row,col>, <-1,-1> if no valid attack is found
