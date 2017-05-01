@@ -72,7 +72,7 @@ public:
 		gotoxy(table_end.X, table_end.Y);
 	}
 	~ConsolePrinter() {
-		if (this->board != NULL) {
+		if (this->board != nullptr) {
 			delete[] this->board;
 		}
 	}

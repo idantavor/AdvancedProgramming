@@ -1,5 +1,12 @@
 #include "Position.h"
 
+Position::Position()
+{
+	x_coord = 0;
+	y_coord = 0;
+	isAlive = true;
+}
+
 Position::Position(int x, int y) {
 	x_coord = x;
 	y_coord = y;

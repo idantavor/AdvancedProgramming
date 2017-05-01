@@ -4,8 +4,8 @@
 class submarine :public Ship
 {
 	public:
-		submarine( std::list<Position>* positionList)
-			: Ship(length, positionList) {
+		submarine()
+			: Ship(length) {
 		}
 
 		int getLength() override {

@@ -7,15 +7,6 @@ void NaiveAlgo::notifyOnAttackResult(int player, int row, int col, AttackResult 
 	//currently nothing to do with it..
 }
 
-NaiveAlgo::NaiveAlgo(){
-	currentPosition = new Position(0, 0);
-}
-
-NaiveAlgo::~NaiveAlgo()
-{
-	delete currentPosition;
-}
-
 bool NaiveAlgo::init(const std::string& path)
 {
 	//TODO
@@ -36,7 +27,6 @@ void NaiveAlgo::setBoard(int player, const char** board, int numRows, int numCol
 			m_board[i][j] = board[i][j];
 		}
 	}
-	//userFleet = Utility::setUserFleetFromBoard(board, numRows, numCols);
 }
 
 pair<int, int> NaiveAlgo::attack()
@@ -44,29 +34,30 @@ pair<int, int> NaiveAlgo::attack()
 	if(firstPos)
 	{
 		firstPos = false;
-		return pair<int, int>(currentPosition->getX() + 1, currentPosition->getY() + 1);
+		currentPosition.setPosition(0, 0);
+		return pair<int, int>(currentPosition.getX() + 1, currentPosition.getY() + 1);
 	}
 	getNextPosition(currentPosition);
-	return pair<int,int>(currentPosition->getX()+1, currentPosition->getY()+1);
+	return pair<int,int>(currentPosition.getX()+1, currentPosition.getY()+1);
 }
 
-void NaiveAlgo::getNextPosition(Position* position)
+void NaiveAlgo::getNextPosition(Position position) const
 {
-	int xPos = position->getX();
-	int yPos = position->getY();
+	int xPos = position.getX();
+	int yPos = position.getY();
 	if(yPos < m_rowCount)
 	{
 		yPos++;
-		position->setY(yPos);
+		position.setY(yPos);
 	}
 	else if(xPos < m_colCount)
 	{
 		xPos++;
-		position->setPosition(xPos, 0);
+		position.setPosition(xPos, 0);
 	}
 	else
 	{
-		position->setPosition(-2, -2);
+		position.setPosition(-2, -2);
 		return;
 	}
 	
@@ -76,25 +67,25 @@ void NaiveAlgo::getNextPosition(Position* position)
 	}
 }
 
-bool NaiveAlgo::isPositionOk(Position* position)
+bool NaiveAlgo::isPositionOk(Position position) const
 {
-	if(m_board[position->getX()][position->getY()] != ' ')
+	if(m_board[position.getX()][position.getY()] != ' ')
 	{
 		return false;
 	}
-	if (position->getX() > 0 && m_board[position->getX()-1][position->getY()] != ' ')
+	if (position.getX() > 0 && m_board[position.getX()-1][position.getY()] != ' ')
 	{
 		return false;
 	}
-	if (position->getX() < m_rowCount-1 && m_board[position->getX() + 1][position->getY()] != ' ')
+	if (position.getX() < m_rowCount-1 && m_board[position.getX() + 1][position.getY()] != ' ')
 	{
 		return false;
 	}
-	if (position->getY() > 0 && m_board[position->getX()][position->getY()-1] != ' ')
+	if (position.getY() > 0 && m_board[position.getX()][position.getY()-1] != ' ')
 	{
 		return false;
 	}
-	if (position->getY() < m_colCount - 1 && m_board[position->getX()][position->getY()+1] != ' ')
+	if (position.getY() < m_colCount - 1 && m_board[position.getX()][position.getY()+1] != ' ')
 	{
 		return false;
 	}

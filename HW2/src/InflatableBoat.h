@@ -4,8 +4,8 @@
 class InflatableBoat: public Ship
 {
 	public:
-		InflatableBoat(std::list<Position>* positionList) 
-			: Ship(length, positionList){
+		InflatableBoat() 
+			: Ship(length){
 		}
 
 		int getLength() override {

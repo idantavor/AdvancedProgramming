@@ -29,10 +29,10 @@ class BattleManager {
 		vector<string> filePaths;
 		IBattleshipGameAlgo* playerA=nullptr;
 		IBattleshipGameAlgo* playerB=nullptr;
-		UserFleet* fleetA=nullptr;
-		UserFleet* fleetB=nullptr;
+		UserFleet fleetA;
+		UserFleet fleetB;
 		string* board;
-		IBattleshipGameAlgo* loadFromDLL(string path);
+	static IBattleshipGameAlgo* loadFromDLL(string path);
 		int boardSize;
 		bool quiet;
 		static bool isKnownLetter(char c);
@@ -43,8 +43,6 @@ class BattleManager {
 			if (playerA != nullptr) delete playerA;
 			if (playerB != nullptr) delete playerB;
 			if (board != nullptr)delete[] board;
-			if (fleetA != nullptr) delete fleetA;
-			if (fleetB != nullptr) delete fleetB;
 		}
 		BattleManager(const int boardSize = 10,bool quiet=false,int delay=ATTACKS_DELAY) {
 			this->boardSize = boardSize;
@@ -54,21 +52,14 @@ class BattleManager {
 		}
 
 	void loadBoard(const string& boardPath) const;
-		bool validateBoard();
-		void buildShip(int x, int y, char shipChar, bool** visitBoard, list<Ship*>* shipsListA,
-			list<Ship*>* shipsListB, list<char>* failedCharA, list<char>* failedCharB) const;
-		void shipCollectChars(int x, int y, char shipChar, bool** visitBoard, list<Position>* positionList) const;
+	bool validateBoard();
+	void buildShip(int x, int y, char shipChar, bool** visitBoard, list<char>& failedCharA, list<char>& failedCharB);
+	void shipCollectChars(int x, int y, char shipChar, bool** visitBoard, Ship& ship) const;
 	bool validateFilesExistanceAndBoardValidate(const std::string& dirPath = "");
-		bool runBattle(const string& dirPath);
+	bool runBattle(const string& dirPath);
 	void buildUserBoards(char** boardA, char** boardB) const;
 	bool isSpacesAreOK(int, int, char) const;
-		bool checkSpacesInPosition(int x, int y, char c) const;
+	bool checkSpacesInPosition(int x, int y, char c) const;
 };
-
-
-void getFileNamesFromDir(std::vector<string> &out, const string &directory);
-bool has_suffix(const std::string &str, const std::string &suffix);
-bool dirExists(const std::string& dirName_in);
-void printFinishMsg(int scoreA, int scoreB, int winner);
 #endif
 

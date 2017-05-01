@@ -1,116 +1,7 @@
 #pragma once
 #include "BattleManager.h"
-#include "UserFleet.h"
-#include <windows.h>
-#include "Ship.h"
-#include "InflatableBoat.h"
-#include "battleship.h"
-#include "submarine.h"
-#include "missileBoat.h"
 #include "Utility.h"
-
-UserFleet* Utility::setUserFleetFromBoard(const char** board, int numRows, int numCols){
-	list<Ship*>* shipsList = new list<Ship*>();
-
-	//Insilize visit board
-	bool** visitBoard = new bool*[numRows];
-	for (int i = 0; i < numRows; i++) {
-		visitBoard[i] = new bool[numCols];
-		for (int j = 0; j< numCols; j++) {
-			visitBoard[i][j] = false;
-		}
-	}
-
-	//create boards and do checks
-	for (int row = 0; row < numRows; row++) {
-		string boardRow = board[row];
-		for (int column = 0; column < numCols; column++)
-		{
-			char shipChar = boardRow[column];
-			if (visitBoard[row][column]) {
-				continue;
-			}
-			if (shipChar == ' ')
-			{
-				visitBoard[row][column] = true;
-				continue;
-			}
-
-			buildUserShip(board, row, column, shipChar, visitBoard, shipsList, numRows, numCols);
-		}
-	}
-
-	//delete visitBoard;
-	for (int i = 0; i < numRows; i++) {
-		delete[] visitBoard[i];
-	}
-	delete[] visitBoard;
-
-	UserFleet* fleet = new UserFleet(shipsList);
-
-	delete shipsList;
-
-	return fleet;
-}
-
-void Utility::buildUserShip(const char** board, int x, int y, char shipChar, bool** visitBoard, list<Ship*>* shipsList, int numRows, int numCols)
-{
-
-	if (shipChar == InflatableBoat::symbolAPlayer || shipChar == InflatableBoat::symbolBPlayer)
-	{
-		list<Position>* positionList = new list<Position>();
-		collectShipChars(board,x, y, shipChar, visitBoard, positionList, numRows,numCols);
-		InflatableBoat* boat = new InflatableBoat(positionList);
-		shipsList->push_back(boat);
-	}
-	else if (shipChar == missileBoat::symbolAPlayer || shipChar == missileBoat::symbolBPlayer)
-	{
-		list<Position>* positionList = new list<Position>();
-		collectShipChars(board, x, y, shipChar, visitBoard, positionList, numRows, numCols);
-		missileBoat* boat = new missileBoat(positionList);
-		shipsList->push_back(boat);	
-	}
-	else if (shipChar == submarine::symbolAPlayer || shipChar == submarine::symbolBPlayer)
-	{
-		list<Position>* positionList = new list<Position>();
-		collectShipChars(board, x, y, shipChar, visitBoard, positionList, numRows, numCols);
-		submarine* boat = new submarine(positionList);
-		shipsList->push_back(boat);
-	}
-	else if (shipChar == battleship::symbolAPlayer || shipChar == battleship::symbolBPlayer)
-	{
-		list<Position>* positionList = new list<Position>();
-		collectShipChars(board, x, y, shipChar, visitBoard, positionList, numRows, numCols);
-		battleship* boat = new battleship(positionList);
-		shipsList->push_back(boat);
-	}
-}
-
-void Utility::collectShipChars(const char** board, int x, int y, char shipChar, bool ** visitBoard, list<Position>* positionList, int numRows, int numCols)
-{
-	visitBoard[x][y] = true;
-	(*positionList).push_back(Position(x, y));
-	int x_i = x + 1;
-	if (x_i > 0 && x_i < numRows && !visitBoard[x_i][y] && board[x_i][y] == shipChar)
-	{
-		collectShipChars(board, x_i, y, shipChar, visitBoard, positionList, numRows, numCols);
-	}
-	int y_i = y + 1;
-	if (y_i > 0 && y_i < numCols && !visitBoard[x][y_i] && board[x][y_i] == shipChar)
-	{
-		collectShipChars(board, x, y_i, shipChar, visitBoard, positionList, numRows, numCols);
-	}
-	x_i = x - 1;
-	if (x_i > 0 && x_i < numRows && !visitBoard[x_i][y] && board[x_i][y] == shipChar)
-	{
-		collectShipChars(board, x_i, y, shipChar, visitBoard, positionList, numRows, numCols);
-	}
-	y_i = y - 1;
-	if (y_i > 0 && y_i < numCols && !visitBoard[x][y_i] && board[x][y_i] == shipChar)
-	{
-		collectShipChars(board, x, y_i, shipChar, visitBoard, positionList, numRows, numCols);
-	}
-}
+#include "dirent.h"
 
 pair<bool, string> Utility::getCommandLineArg(const string arg_to_find, int argc, char * argv[])
 {
@@ -138,5 +29,46 @@ pair<bool, string> Utility::getCommandLineArg(const string arg_to_find, int argc
 	}
 	return result;
 }
+
+void  Utility::getFileNamesFromDir(std::vector<string> &out, const string &directory) {
+	DIR *dpdf;
+	struct dirent *epdf;
+	dpdf = opendir(directory.c_str());
+	if (dpdf != NULL) {
+		while (epdf = readdir(dpdf)) {
+			if (string(epdf->d_name) == "." || string(epdf->d_name) == "..")continue;
+			out.push_back(epdf->d_name);
+		}
+		closedir(dpdf);
+	}
+}
+
+void Utility::printFinishMsg(int scoreA, int scoreB, int winner) { // winner A_TURN for A, B_TURN for B , -1 for no winner
+	if (winner != -1) {
+		cout << "Player " << ((winner == A_TURN) ? "A " : "B ") << "won" << endl;
+	}
+	cout << "Points:" << endl;
+	cout << "Player A: " << scoreA << endl;
+	cout << "Player B: " << scoreB << endl;
+}
+
+bool Utility::dirExists(const std::string& dirName_in)
+{
+	DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
+	if (ftyp == INVALID_FILE_ATTRIBUTES)
+		return false;
+
+	if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
+		return true;
+	return false;
+}
+
+bool Utility::has_suffix(const std::string &str, const std::string &suffix)
+{
+	return str.size() >= suffix.size() &&
+		str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+
 
 

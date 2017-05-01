@@ -3,12 +3,7 @@
 
 #include "BattleManager.h"
 #include "BattleShipGameFromFile.h"
-#include <iostream>
-#include <cstdio>
-
-#include <ctype.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include "ConsolePrinter.h"
 #include "Utility.h"
 

@@ -16,24 +16,8 @@
 #include "submarine.h"
 #include "missileBoat.h"
 #include "NaiveAlgo.h"
+#include "Utility.h"
 
-
-bool dirExists(const std::string& dirName_in)
-{
-	DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
-	if (ftyp == INVALID_FILE_ATTRIBUTES)
-		return false;  
-
-	if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
-		return true;  
-	return false;    
-}
-
-bool has_suffix(const std::string &str, const std::string &suffix)
-{
-	return str.size() >= suffix.size() &&
-		str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
-}
 
 void BattleManager::loadBoard(const string& boardPath) const
 {
@@ -127,25 +111,18 @@ IBattleshipGameAlgo* BattleManager::loadFromDLL(string path)
 	return instance;
 }
 
-bool BattleManager::isKnownLetter(char c){
+bool BattleManager::isKnownLetter(char c) {
 
-	if (c == InflatableBoat::symbolAPlayer || c == InflatableBoat::symbolBPlayer ||
-		c == missileBoat::symbolAPlayer  || c == missileBoat::symbolBPlayer ||
+	return (c == InflatableBoat::symbolAPlayer || c == InflatableBoat::symbolBPlayer ||
+		c == missileBoat::symbolAPlayer || c == missileBoat::symbolBPlayer ||
 		c == submarine::symbolAPlayer || c == submarine::symbolBPlayer ||
-		c == battleship::symbolAPlayer || c == battleship::symbolBPlayer)
-	{
-		return true;
-	}
-
-	return false;
+		c == battleship::symbolAPlayer || c == battleship::symbolBPlayer);
 }
 
 bool BattleManager::validateBoard()
 {
-	list<Ship*>* shipsListA = new list<Ship*>();
-	list<Ship*>* shipsListB = new list<Ship*>();
-	list<char>* failedCharA = new list<char>();
-	list<char>* failedCharB = new list<char>();
+	list<char> failedCharA;
+	list<char> failedCharB;
 
 	//Insilize visit board
 	bool** visitBoard = new bool*[boardSize];
@@ -186,7 +163,7 @@ bool BattleManager::validateBoard()
 				continue;
 			}
 
-			buildShip(row, column, shipChar, visitBoard, shipsListA, shipsListB, failedCharA, failedCharB);
+			buildShip(row, column, shipChar, visitBoard, failedCharA, failedCharB);
 		}
 	}
  
@@ -196,236 +173,222 @@ bool BattleManager::validateBoard()
 	}
 	delete[] visitBoard;
 
-	fleetA = new UserFleet(shipsListA);
-	fleetB = new UserFleet(shipsListB);
-
 	bool checksPass = true;
 
-	if(!failedCharA->empty() || !failedCharB->empty())
+	if(!failedCharA.empty() || !failedCharB.empty())
 	{
 		checksPass = false;
 		
 	}
-	for (std::list<char>::iterator it = (*failedCharA).begin(); it != (*failedCharA).end(); ++it)
+	for (std::list<char>::iterator it = (failedCharA).begin(); it != (failedCharA).end(); ++it)
 	{
 		WRONG_SIZE_A(*it);
 	}
-	for (std::list<char>::iterator it = (*failedCharB).begin(); it != (*failedCharB).end(); ++it)
+	for (std::list<char>::iterator it = (failedCharB).begin(); it != (failedCharB).end(); ++it)
 	{
 		WRONG_SIZE_B(*it);
 	}
 
-	if (fleetA->getNumberOfShips() > NUMBR_OF_SHIPS)
+	if (fleetA.getNumberOfShips() > NUMBR_OF_SHIPS)
 	{
 		cout << TOO_MANY_A;
 		checksPass = false;
 	}
-	if (fleetA->getNumberOfShips() < NUMBR_OF_SHIPS)
+	if (fleetA.getNumberOfShips() < NUMBR_OF_SHIPS)
 	{
 		cout << TOO_FEW_A;
 		checksPass = false;
 	}
-	if (fleetB->getNumberOfShips() > NUMBR_OF_SHIPS)
+	if (fleetB.getNumberOfShips() > NUMBR_OF_SHIPS)
 	{
 		cout << TOO_MANY_B;
 		checksPass = false;
 	}
-	if (fleetB->getNumberOfShips() < NUMBR_OF_SHIPS)
+	if (fleetB.getNumberOfShips() < NUMBR_OF_SHIPS)
 	{
 		cout << TOO_FEW_B;
 		checksPass = false;
 	}
-
+	
 	if(adjacentError)
 	{
 		cout << ADJACENT;
 		checksPass = false;
 	}
-	delete failedCharA;
-	delete failedCharB;
-	delete shipsListA;
-	delete shipsListB;
 
 	return checksPass;
 }
 
-void BattleManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list<Ship*>* shipsListA,
-	list<Ship*>* shipsListB, list<char>* failedCharA, list<char>* failedCharB) const
+void BattleManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list<char>& failedCharA, list<char>& failedCharB) 
 {
 
 	if (shipChar == InflatableBoat::symbolAPlayer)
 	{
-		list<Position>* positionList = new list<Position>();
-		shipCollectChars(x, y, shipChar, visitBoard, positionList);
-		InflatableBoat* boat = new InflatableBoat(positionList);
+		InflatableBoat* boat = new InflatableBoat();
+		shipCollectChars(x, y, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
-			bool found = (std::find((*failedCharA).begin(), (*failedCharA).end(), InflatableBoat::symbolAPlayer) != (*failedCharA).end());
+			bool found = (std::find((failedCharA).begin(), (failedCharA).end(), InflatableBoat::symbolAPlayer) != (failedCharA).end());
 			if (!found) {
-				failedCharA->push_back(InflatableBoat::symbolAPlayer);
+				failedCharA.push_back(InflatableBoat::symbolAPlayer);
 			}
 			delete boat;
 		}
 		else
 		{
-			shipsListA->push_back(boat);
+			fleetA.addShipToList(boat);
 		}
 	}
 	else if (shipChar == InflatableBoat::symbolBPlayer)
 	{
-		list<Position>* positionList = new list<Position>();
-		shipCollectChars(x, y, shipChar, visitBoard, positionList);
-		InflatableBoat* boat = new InflatableBoat(positionList);
+		InflatableBoat* boat = new InflatableBoat();
+		shipCollectChars(x, y, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
-			bool found = (std::find((*failedCharB).begin(), (*failedCharB).end(), InflatableBoat::symbolBPlayer) != (*failedCharB).end());
+			bool found = (std::find((failedCharB).begin(), (failedCharB).end(), InflatableBoat::symbolBPlayer) != (failedCharB).end());
 			if (!found) {
-				failedCharB->push_back(InflatableBoat::symbolBPlayer);
+				failedCharB.push_back(InflatableBoat::symbolBPlayer);
 			}
 			delete boat;
 		}
 		else
 		{
-			shipsListB->push_back(boat);
+			fleetB.addShipToList(boat);
 		}
 	}
 	else if (shipChar == missileBoat::symbolAPlayer)
 	{
-		list<Position>* positionList = new list<Position>();
-		shipCollectChars(x, y, shipChar, visitBoard, positionList);
-		missileBoat* boat = new missileBoat(positionList);
+		missileBoat* boat = new missileBoat();
+		shipCollectChars(x, y, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
 
-			bool found = (std::find((*failedCharA).begin(), (*failedCharA).end(), missileBoat::symbolAPlayer) != (*failedCharA).end());
+			bool found = (std::find((failedCharA).begin(), (failedCharA).end(), missileBoat::symbolAPlayer) != (failedCharA).end());
 			if (!found) {
-				failedCharA->push_back(missileBoat::symbolAPlayer);
+				failedCharA.push_back(missileBoat::symbolAPlayer);
 			}
 			delete boat;
 		}
 		else
 		{
-			shipsListA->push_back(boat);
+			fleetA.addShipToList(boat);
 		}
 	}
 	else if (shipChar == missileBoat::symbolBPlayer)
 	{
-		list<Position>* positionList = new list<Position>();
-		shipCollectChars(x, y, shipChar, visitBoard, positionList);
-		missileBoat* boat = new missileBoat(positionList);
+		missileBoat* boat = new missileBoat();
+		shipCollectChars(x, y, shipChar, visitBoard, *boat);
+	
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
-			bool found = (std::find((*failedCharB).begin(), (*failedCharB).end(), missileBoat::symbolBPlayer) != (*failedCharB).end());
+			bool found = (std::find((failedCharB).begin(), (failedCharB).end(), missileBoat::symbolBPlayer) != (failedCharB).end());
 			if (!found) {
-				failedCharB->push_back(missileBoat::symbolBPlayer);
+				failedCharB.push_back(missileBoat::symbolBPlayer);
 			}
 			delete boat;
 		}
 		else {
-			shipsListB->push_back(boat);
+			fleetB.addShipToList(boat);
 		}
 	}
 	else if (shipChar == submarine::symbolAPlayer)
 	{
-		list<Position>* positionList = new list<Position>();
-		shipCollectChars(x, y, shipChar, visitBoard, positionList);
-		submarine* boat = new submarine(positionList);
+		submarine* boat = new submarine();
+		shipCollectChars(x, y, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
-			bool found = (std::find((*failedCharA).begin(), (*failedCharA).end(), submarine::symbolAPlayer) != (*failedCharA).end());
+			bool found = (std::find((failedCharA).begin(), (failedCharA).end(), submarine::symbolAPlayer) != (failedCharA).end());
 			if (!found) {
-				failedCharA->push_back(submarine::symbolAPlayer);
+				failedCharA.push_back(submarine::symbolAPlayer);
 			}
 			delete boat;
 		}
 		else {
-			shipsListA->push_back(boat);
+			fleetA.addShipToList(boat);
 		}
 	}
 	else if (shipChar == submarine::symbolBPlayer)
 	{
-		list<Position>* positionList = new list<Position>();
-		shipCollectChars(x, y, shipChar, visitBoard, positionList);
-		submarine* boat = new submarine(positionList);
+		submarine* boat = new submarine();
+		shipCollectChars(x, y, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
-			bool found = (std::find((*failedCharB).begin(), (*failedCharB).end(), submarine::symbolBPlayer) != (*failedCharB).end());
+			bool found = (std::find((failedCharB).begin(), (failedCharB).end(), submarine::symbolBPlayer) != (failedCharB).end());
 			if (!found) {
-				failedCharB->push_back(submarine::symbolBPlayer);
+				failedCharB.push_back(submarine::symbolBPlayer);
 			}
 			delete boat;
 		}
 		else {
-			shipsListB->push_back(boat);
+			fleetB.addShipToList(boat);
 		}
 	}
 	else if (shipChar == battleship::symbolAPlayer)
 	{
-		list<Position>* positionList = new list<Position>();
-		shipCollectChars(x, y, shipChar, visitBoard, positionList);
-		battleship* boat = new battleship(positionList);
+		battleship* boat = new battleship();
+		shipCollectChars(x, y, shipChar, visitBoard, *boat);
+		
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
-			bool found = (std::find((*failedCharA).begin(), (*failedCharA).end(), battleship::symbolAPlayer) != (*failedCharA).end());
+			bool found = (std::find((failedCharA).begin(), (failedCharA).end(), battleship::symbolAPlayer) != (failedCharA).end());
 			if (!found) {
-				failedCharA->push_back(battleship::symbolAPlayer);
+				failedCharA.push_back(battleship::symbolAPlayer);
 			}
 			delete boat;
 		}
 		else {
-			shipsListA->push_back(boat);
+			fleetA.addShipToList(boat);
 		}
 	}
 	else if (shipChar == battleship::symbolBPlayer)
 	{
-		list<Position>* positionList = new list<Position>();
-		shipCollectChars(x, y, shipChar, visitBoard, positionList);
-		battleship* boat = new battleship(positionList);
+		battleship* boat = new battleship();
+		shipCollectChars(x, y, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
-			bool found = (std::find((*failedCharB).begin(), (*failedCharB).end(), battleship::symbolBPlayer) != (*failedCharB).end());
+			bool found = (std::find((failedCharB).begin(), (failedCharB).end(), battleship::symbolBPlayer) != (failedCharB).end());
 			if (!found) {
-				failedCharB->push_back(battleship::symbolBPlayer);
+				failedCharB.push_back(battleship::symbolBPlayer);
 			}
 			delete boat;
 		}
 		else {
-			shipsListB->push_back(boat);
+			fleetB.addShipToList(boat);
 		}
 	}
 }
 
 
-void BattleManager::shipCollectChars(int x, int y, char shipChar, bool** visitBoard, list<Position>* positionList) const{
+void BattleManager::shipCollectChars(int x, int y, char shipChar, bool** visitBoard, Ship& ship) const{
 	visitBoard[x][y] = true;
-	(*positionList).push_back(Position(x, y));
+	ship.addPointToTheList(x, y);
 	int x_i = x+1;
 	if(x_i >= 0 && x_i < boardSize && !visitBoard[x_i][y] && board[x_i][y] == shipChar)
 	{
-		shipCollectChars(x_i, y, shipChar, visitBoard, positionList);
+		shipCollectChars(x_i, y, shipChar, visitBoard, ship);
 	}
 	int y_i = y + 1;
 	if(y_i >= 0 && y_i < boardSize && !visitBoard[x][y_i] && board[x][y_i] == shipChar)
 	{
-		shipCollectChars(x, y_i, shipChar, visitBoard, positionList);
+		shipCollectChars(x, y_i, shipChar, visitBoard, ship);
 	}
 	x_i = x -1 ;
 	if (x_i >= 0 && x_i < boardSize && !visitBoard[x_i][y] && board[x_i][y] == shipChar)
 	{
-		shipCollectChars(x_i, y, shipChar, visitBoard, positionList);
+		shipCollectChars(x_i, y, shipChar, visitBoard, ship);
 	}
 	y_i = y - 1;
 	if (y_i >= 0 && y_i < boardSize && !visitBoard[x][y_i] && board[x][y_i] == shipChar)
 	{
-		shipCollectChars(x, y_i, shipChar, visitBoard, positionList);
+		shipCollectChars(x, y_i, shipChar, visitBoard, ship);
 	}
 }
 bool BattleManager::validateFilesExistanceAndBoardValidate(const std::string& dirPath) {
@@ -447,21 +410,21 @@ bool BattleManager::validateFilesExistanceAndBoardValidate(const std::string& di
 	}
 	
 	//if dirPath provided check if dir exists
-	if (searchIn != "." && !dirExists(searchIn)) {
+	if (searchIn != "." && !Utility::dirExists(searchIn)) {
 		cout << "Wrong path : " << searchIn << endl;
 		return false;
 	}
 	
 	//get file names in dir path
 	vector<string> fileNames;
-	getFileNamesFromDir(fileNames, searchIn);
+	Utility::getFileNamesFromDir(fileNames, searchIn);
 
 	for (unsigned int i = 0; i < fileNames.size(); i++) {
-		if (has_suffix(fileNames[i], suffixes[BOARD_PATH])) {
+		if (Utility::has_suffix(fileNames[i], suffixes[BOARD_PATH])) {
 			filePaths[BOARD_PATH] = searchIn + '\\' + fileNames[i];
 			isBoardFound = true;
 		}
-		if (has_suffix(fileNames[i], suffixes[1])) {
+		if (Utility::has_suffix(fileNames[i], suffixes[1])) {
 			dllFiels.push_back(fileNames[i]);
 		}
 	}
@@ -561,7 +524,7 @@ bool BattleManager::runBattle(const string & dirPath)
 
 	while (true) {
 		if (playerAFin && playerBFin) {
-			printFinishMsg(playerAScore, playerBScore, -1);
+			Utility::printFinishMsg(playerAScore, playerBScore, -1);
 			return true;
 		}
 		pair<int, int> currAttack = (currentTurn == A_TURN) ? playerA->attack() : playerB->attack();
@@ -572,8 +535,8 @@ bool BattleManager::runBattle(const string & dirPath)
 			continue;
 		}
 		Position posToAttack = Position(currAttack.first - 1, currAttack.second - 1);
-		auto result = (currentTurn == A_TURN) ? fleetB->executeAttack(posToAttack) : fleetA->executeAttack(posToAttack);
-		auto selfResult = (currentTurn == A_TURN) ? fleetA->executeAttack(posToAttack) : fleetB->executeAttack(posToAttack);
+		auto result = (currentTurn == A_TURN) ? fleetB.executeAttack(posToAttack) : fleetA.executeAttack(posToAttack);
+		auto selfResult = (currentTurn == A_TURN) ? fleetA.executeAttack(posToAttack) : fleetB.executeAttack(posToAttack);
 	
 		AttackResult unifiedRes = AttackResult::Miss;
 		bool shouldSwitchTurn = false;
@@ -608,12 +571,12 @@ bool BattleManager::runBattle(const string & dirPath)
 		playerB->notifyOnAttackResult(currentTurn, currAttack.first, currAttack.second, unifiedRes); //notify B
 		if (!quiet)cp.print_attack(posToAttack, currentTurn, unifiedRes);//print attack to console if not quiet
 		//check game status and report accordingly
-		if (!fleetA->isNotLose()) { // a lost meaning b won
-			printFinishMsg(playerAScore, playerBScore, B_TURN);
+		if (!fleetA.isNotLose()) { // a lost meaning b won
+			Utility::printFinishMsg(playerAScore, playerBScore, B_TURN);
 			return true;
 		}
-		if(!fleetB->isNotLose()) { // B lost meaning A won
-			printFinishMsg(playerAScore, playerBScore, A_TURN);
+		if(!fleetB.isNotLose()) { // B lost meaning A won
+			Utility::printFinishMsg(playerAScore, playerBScore, A_TURN);
 			return true;
 		}
 		if (shouldSwitchTurn) {
@@ -673,26 +636,4 @@ bool BattleManager::checkSpacesInPosition(int x, int y, char c) const
 	return true;
 }
 
-
-void getFileNamesFromDir(std::vector<string> &out, const string &directory) {
-	DIR *dpdf;
-	struct dirent *epdf;
-	dpdf = opendir(directory.c_str());
-	if (dpdf != NULL) {
-		while (epdf = readdir(dpdf)) {
-			if (string(epdf->d_name) == "." || string(epdf->d_name) == "..")continue;
-			out.push_back(epdf->d_name);
-		}
-		closedir(dpdf);
-	}
-}
-
-void printFinishMsg(int scoreA, int scoreB, int winner) { // winner A_TURN for A, B_TURN for B , -1 for no winner
-	if (winner != -1) {
-		cout << "Player " << ((winner == A_TURN) ? "A " : "B " )<< "won" << endl;
-	}
-	cout << "Points:" << endl;
-	cout << "Player A: " << scoreA << endl;
-	cout << "Player B: " << scoreB << endl;
-}
 	
