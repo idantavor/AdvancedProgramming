@@ -49,7 +49,7 @@ pair<int, int> NaiveAlgo::attack()
 	return pair<int,int>(currentPosition.getX()+1, currentPosition.getY()+1);
 }
 
-void NaiveAlgo::getNextPosition(Position position) const
+void NaiveAlgo::getNextPosition(Position& position) const
 {
 	int xPos = position.getX();
 	int yPos = position.getY();
