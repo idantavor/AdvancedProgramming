@@ -6,6 +6,7 @@ class Position {
 	int x_coord, y_coord; // coordinates of the point
 
 public:
+	Position();
 	Position(int, int);
 	int getX() const;
 	int getY() const;

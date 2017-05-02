@@ -5,11 +5,12 @@
 class UserFleet
 {
 	public:
-	explicit UserFleet(std::list<Ship*>*);
+	UserFleet();
 	~UserFleet();
 	std::pair<AttackResult, Ship*> UserFleet::executeAttack(Position & p) ;
 		bool isNotLose();
 		int getNumberOfShips() const;
+		void addShipToList(Ship* ship);
 	protected:
 		std::list<Ship*> shipsList;
 		

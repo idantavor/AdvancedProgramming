@@ -4,8 +4,8 @@
 
 class Ship {
 public:
-	Ship(int, std::list<Position>*);
-	virtual ~Ship();
+	virtual ~Ship() = default;
+	explicit Ship(int len);
 	virtual bool isPositionInShip(const Position p);
 	virtual bool isShipAlive() const;
 	virtual bool attackShip(const Position& p);
@@ -15,7 +15,7 @@ public:
 	virtual char getSymbolAPlayer() = 0;
 	virtual char getSymbolBPlayer() = 0;
 	virtual bool checkShape();
-	std::list<Position>* positionList;
+	std::list<Position> positionList;
 
 
 protected:

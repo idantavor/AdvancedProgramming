@@ -1,12 +1,12 @@
 #include "BattleShipGameSmartAlgo.h"
-
+#include "IBattleshipGameAlgo.h"
 
 //C'tor
 BattleShipGameSmartAlgo::BattleShipGameSmartAlgo() {
 	//here the attachFilePath should exist
 	m_mode = SEARCH_MODE;
 	m_shipsUnderAttack.clear();
-	srand(time(NULL));
+	srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 //D'tor
@@ -326,5 +326,7 @@ bool BattleShipGameSmartAlgo::areShipsAdjacent(const set<std::pair<int, int>>& s
 	return false;
 }
 
-
+IBattleshipGameAlgo* GetAlgorithm() {
+	return new BattleShipGameSmartAlgo();
+};
 

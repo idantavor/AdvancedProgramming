@@ -4,8 +4,8 @@
 class missileBoat : public Ship
 {
 	public:
-		missileBoat(std::list<Position>* positionList)
-			: Ship(length, positionList) {
+		missileBoat()
+			: Ship(length) {
 		}
 
 		int getLength() override {

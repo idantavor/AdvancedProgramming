@@ -1,19 +1,12 @@
 #include "UserFleet.h"
 
 
-UserFleet::UserFleet(std::list<Ship*>*shipsL)
+UserFleet::UserFleet()
 {
-	shipsList = *shipsL;
 }
 
 UserFleet::~UserFleet()
 {
-	//for (std::list<Ship*>::iterator it = shipsList.begin(); it != shipsList.end(); ++it) {
-	//	//delete *it;
-	//	//shipsList.erase(it);
-	//	int x = 1;
-	//}
-	//shipsList.clear();
 	for (auto &it : shipsList) delete it; 
 	shipsList.clear();
 }
@@ -51,5 +44,10 @@ bool UserFleet::isNotLose()
 int UserFleet::getNumberOfShips() const
 {
 	return shipsList.size();
+}
+
+void UserFleet::addShipToList(Ship* ship)
+{
+	shipsList.push_back(ship);
 }
 

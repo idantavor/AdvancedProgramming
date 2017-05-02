@@ -5,8 +5,8 @@ class battleship : public Ship
 {
 
 	public:
-		battleship(std::list<Position>* positionList)
-			: Ship(length, positionList) {
+		battleship()
+			: Ship(length) {
 		}
 		
 		int getLength() override {

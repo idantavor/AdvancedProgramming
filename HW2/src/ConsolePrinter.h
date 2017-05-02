@@ -21,12 +21,12 @@ class ConsolePrinter{
 private:
 	string * board = NULL;
 	int board_size = 0;
-	void gotoxy(int column, int line);
-	int wherex();
-	int wherey();
+	static void gotoxy(int column, int line);
+	static int wherex();
+	static int wherey();
 	COORD table_start = { 0,0 };
-	void setcursor(bool visible, DWORD size);
-	int get_color_by_char(char c);
+	void setcursor(bool visible, DWORD size) const;
+	int get_color_by_char(char c) const;
 	void setTextColor(int color) {
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 	};
@@ -66,13 +66,13 @@ public:
 	
 	void set_delay(int delay) { this->delay = delay; };
 
-	COORD set_font_size(int x, int y);
+	static COORD set_font_size(int x, int y);
 
 	void move_cursor_to_end() {
 		gotoxy(table_end.X, table_end.Y);
 	}
 	~ConsolePrinter() {
-		if (this->board != NULL) {
+		if (this->board != nullptr) {
 			delete[] this->board;
 		}
 	}

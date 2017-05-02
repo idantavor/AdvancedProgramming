@@ -1,17 +1,16 @@
 #include "ship.h"
 
-Ship::Ship(int len, std::list<Position>* pl)
+Ship::Ship(int len)
 {
 	currentLength = len;
 	isHorizontal = false;
-	positionList = pl;
 }
 
 bool Ship::isPositionInShip(const Position p)
 {
 
-	for (std::list<Position>::iterator it = (*positionList).begin(); 
-		it != (*positionList).end(); ++it)
+	for (std::list<Position>::iterator it = (positionList).begin(); 
+		it != (positionList).end(); ++it)
 	{
 		if ((*it) == p)
 		{
@@ -28,8 +27,8 @@ bool Ship::attackShip(const Position& p)
 	if (!isShipAlive()) {
 		return false;
 	}
-	for (std::list<Position>::iterator it = (*positionList).begin();
-		it != (*positionList).end(); ++it)
+	for (std::list<Position>::iterator it = (positionList).begin();
+		it != (positionList).end(); ++it)
 	{
 		if ((*it) == p)
 		{
@@ -47,7 +46,7 @@ bool Ship::attackShip(const Position& p)
 
 bool Ship::addPointToTheList(int x, int y)
 {
-	(*positionList).push_back(Position(x, y));
+	(positionList).push_back(Position(x, y));
 	return false;
 }
 
@@ -63,7 +62,7 @@ bool Ship::checkShape()
 	int x =0;
 	int y =0 ;
 	bool first = true;
-	for (std::list<Position>::iterator it = (*positionList).begin(); it != (*positionList).end(); ++it)
+	for (std::list<Position>::iterator it = (positionList).begin(); it != (positionList).end(); ++it)
 	{
 		if (first)
 		{
@@ -116,11 +115,6 @@ bool Ship::checkShape()
 	}
 
 	return true;
-}
-
-Ship::~Ship()
-{
-	delete positionList;
 }
 
 
