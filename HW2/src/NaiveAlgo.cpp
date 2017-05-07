@@ -53,12 +53,12 @@ void NaiveAlgo::getNextPosition(Position& position) const
 {
 	int xPos = position.getX();
 	int yPos = position.getY();
-	if(yPos < m_rowCount)
+	if(yPos < m_rowCount-1)
 	{
 		yPos++;
 		position.setY(yPos);
 	}
-	else if(xPos < m_colCount)
+	else if(xPos < m_colCount-1)
 	{
 		xPos++;
 		position.setPosition(xPos, 0);
@@ -85,7 +85,7 @@ bool NaiveAlgo::isPositionOk(Position position) const
 	{
 		return false;
 	}
-	if (position.getX() < m_rowCount-1 && m_board[position.getX() + 1][position.getY()] != ' ')
+	if (position.getX() < m_rowCount - 1 && m_board[position.getX() + 1][position.getY()] != ' ')
 	{
 		return false;
 	}

@@ -66,7 +66,7 @@ public:
 	
 	void set_delay(int delay) { this->delay = delay; };
 
-	static COORD set_font_size(int x, int y);
+	static COORD set_font_size(SHORT x, SHORT y);
 
 	void move_cursor_to_end() {
 		gotoxy(table_end.X, table_end.Y);

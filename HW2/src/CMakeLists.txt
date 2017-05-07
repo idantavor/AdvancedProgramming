@@ -57,6 +57,8 @@ set (SMART_ALGO_SOURCE_FILES
 	BattleShipGameSmartAlgo.h
 )
 
+add_definitions(-DUNICODE -D_UNICODE)
+
 ##################################
 ### DO NOT CHANGE FROM HERE ON ###
 ##################################

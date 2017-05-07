@@ -168,10 +168,10 @@ void ConsolePrinter::print_at_location(int x, int y, int color, string print)
 }
 
 
-COORD ConsolePrinter::set_font_size(int x, int y)
+COORD ConsolePrinter::set_font_size(SHORT x, SHORT y)
 {
 
-	COORD dwFontSize = { x,y };
+	COORD dwFontSize = {x , y };
 	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_FONT_INFOEX info{ sizeof(CONSOLE_FONT_INFOEX) };
 	GetCurrentConsoleFontEx(output, false, &info);

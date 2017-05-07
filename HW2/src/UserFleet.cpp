@@ -41,7 +41,7 @@ bool UserFleet::isNotLose()
 	return false;
 }
 
-int UserFleet::getNumberOfShips() const
+size_t UserFleet::getNumberOfShips() const
 {
 	return shipsList.size();
 }

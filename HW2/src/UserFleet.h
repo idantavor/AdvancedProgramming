@@ -9,7 +9,7 @@ class UserFleet
 	~UserFleet();
 	std::pair<AttackResult, Ship*> UserFleet::executeAttack(Position & p) ;
 		bool isNotLose();
-		int getNumberOfShips() const;
+		size_t getNumberOfShips() const;
 		void addShipToList(Ship* ship);
 	protected:
 		std::list<Ship*> shipsList;
