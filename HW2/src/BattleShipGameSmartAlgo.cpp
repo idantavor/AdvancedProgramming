@@ -1,6 +1,8 @@
 #include "BattleShipGameSmartAlgo.h"
 #include "IBattleshipGameAlgo.h"
 
+#include <iostream>
+
 //C'tor
 BattleShipGameSmartAlgo::BattleShipGameSmartAlgo() {
 	//here the attachFilePath should exist
@@ -73,6 +75,7 @@ std::vector<std::pair<int, int>>* BattleShipGameSmartAlgo::getPossibleAttackPosi
 		}
 	}
 	return positions;
+	cout << "position list length is " << positions->size();
 }
 
 void BattleShipGameSmartAlgo::addAttackedPointToShipsList(std::pair<int, int>& attackedPoint)
@@ -221,6 +224,9 @@ bool BattleShipGameSmartAlgo::checkSinglePoint(const std::pair<int, int>& rowCol
 
 void BattleShipGameSmartAlgo::notifyOnAttackResult(int player, int row, int col, AttackResult result) {
 	std::pair<int, int> realPoint = fromRepresntToRealIndex(row, col);
+	if (realPoint == PAIR_NO_MATCH) {
+		return; // invalid attack position, nothing to do with it
+	}
 	row = realPoint.first;
 	col = realPoint.second;
 	if (m_myShips.find(realPoint) != m_myShips.end()) {//other player hit me :(
@@ -282,7 +288,12 @@ std::pair<int, int> BattleShipGameSmartAlgo::getMinMax(set<std::pair<int, int>>&
 
 std::pair<int, int> BattleShipGameSmartAlgo::fromRepresntToRealIndex(int row, int col)
 {
-	return std::pair<int, int>(row - 1, col - 1);
+	if (pair<int,int>(row,col) == PAIR_NO_MATCH) {
+		return PAIR_NO_MATCH;
+	}
+	else {
+		return std::pair<int, int>(row - 1, col - 1);
+	}
 }
 
 std::pair<int, int> BattleShipGameSmartAlgo::fromRealIndexToRepresnt(std::pair<int, int> rowCol)

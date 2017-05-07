@@ -520,12 +520,6 @@ bool BattleManager::runBattle(const string & dirPath)
 			return true;
 		}
 		pair<int, int> currAttack = (currentTurn == A_TURN) ? playerA->attack() : playerB->attack();
-		if (currentTurn == A_TURN) {
-			cout <<"player A attacked " << currAttack.first << " " << currAttack.second << endl;
-		}
-		else {
-			cout << "player B attacked " << currAttack.first << " " << currAttack.second << endl;
-		}
 		if (currAttack == pair<int, int>(-1, -1)) {
 			//mark player finished , switch turns and continue
 			(currentTurn == A_TURN) ? playerAFin = true : playerBFin = true;
