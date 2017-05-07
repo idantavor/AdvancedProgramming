@@ -419,8 +419,10 @@ bool BattleManager::validateFilesExistanceAndBoardValidate(const std::string& di
 
 	for (unsigned int i = 0; i < fileNames.size(); i++) {
 		if (Utility::has_suffix(fileNames[i], suffixes[BOARD_PATH])) {
-			filePaths[BOARD_PATH] = searchIn + '\\' + fileNames[i];
-			isBoardFound = true;
+			if (!isBoardFound) {
+				filePaths[BOARD_PATH] = searchIn + '\\' + fileNames[i];
+				isBoardFound = true;
+			}
 		}
 		if (Utility::has_suffix(fileNames[i], suffixes[1])) {
 			dllFiels.push_back(fileNames[i]);
