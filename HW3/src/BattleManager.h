@@ -1,11 +1,9 @@
 #pragma once
 #include "Ship.h"
 #include "UserFleet.h"
-#include "ConsolePrinter.h"
 #ifndef BATTLE_MANAGER
 #define BATTLE_MANAGER
 #include "IBattleshipGameAlgo.h"
-#include "BattleShipGameFromFile.h"
 #include <string>
 #include <vector>
 #include <direct.h>
@@ -29,14 +27,10 @@ class BattleManager {
 		vector<string> filePaths;
 		IBattleshipGameAlgo* playerA=nullptr;
 		IBattleshipGameAlgo* playerB=nullptr;
-		UserFleet fleetA;
-		UserFleet fleetB;
-		string* board;
+
 	static IBattleshipGameAlgo* loadFromDLL(string path);
-		int boardSize;
-		bool quiet;
+		
 		static bool isKnownLetter(char c);
-		ConsolePrinter cp;
 
 	public:
 		~BattleManager() {
@@ -44,15 +38,12 @@ class BattleManager {
 			if (playerB != nullptr) delete playerB;
 			if (board != nullptr)delete[] board;
 		}
-		BattleManager(const int boardSize = 10,bool quiet=false,int delay=ATTACKS_DELAY) {
-			this->boardSize = boardSize;
-			board = new string[boardSize+1];
-			this->quiet = quiet;
-			this->cp.set_delay(delay);
+		BattleManager()
+		{
+			board = new string[boardWidth +1];
 		}
 
-	void loadBoard(const string& boardPath) const;
-	bool validateBoard();
+
 	void buildShip(int x, int y, char shipChar, bool** visitBoard, list<char>& failedCharA, list<char>& failedCharB);
 	void shipCollectChars(int x, int y, char shipChar, bool** visitBoard, Ship& ship) const;
 	bool validateFilesExistanceAndBoardValidate(const std::string& dirPath = "");
