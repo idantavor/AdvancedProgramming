@@ -1,6 +1,6 @@
 #include "GameManager.h"
 
-bool GameManager::loadBoard(std::list<string> boardPath) const
+bool GameManager::loadBoard(string boardPath)
 {
 	ifstream borderFile(boardPath);
 
@@ -13,62 +13,71 @@ bool GameManager::loadBoard(std::list<string> boardPath) const
 	istream isBoard(borderStream);
 	getline(isBoard, sizesLine);
 
+	depthSize = 0;
+	rowsSize = 0;
+	colsSize = 0;
 
-
-	for (auto column = 0; column < boardSize; column++) {
-		auto endOfLine = false;
-		string line = "";
-		if (borderStream->sgetc() == EOF)
-		{
-			line.append(string(boardSize, ' '));
-			line += '\0';
-			board[column] = line;
-			continue;
-		}
-		while (!endOfLine) {
-			char c = borderStream->sbumpc();
-			switch (c) {
-			case '\n':
-				// in case it's end of file '\n'
-				if (static_cast<int> (line.size()) < boardSize)
-				{
-					//case the line is shorter then boarder size
-					size_t spaceSize = boardSize - line.size();
-					line.append(string(spaceSize, ' '));
-				}
+	board = new string*[depthSize];
+	string emptyLine;
+	for (auto depth = 0; depth < depthSize; depth++) {
+		getline(isBoard, emptyLine);
+		board = new string*[rowsSize];
+		for (auto row = 0; row < rowsSize; row++) {
+			auto endOfLine = false;
+			string line = "";
+			if (borderStream->sgetc() == EOF)
+			{
+				line.append(string(colsSize, ' '));
 				line += '\0';
-				board[column] += line;
-				endOfLine = true;
-				break;
-			case '\r':
-				if (borderStream->sgetc() == '\n') {
-					// in case it's end of file '\r\n'
-					borderStream->sbumpc();
-					size_t lineSize = line.size();
-					if (static_cast<int> (lineSize) < boardSize)
+				board[depth][row] = line;
+				continue;
+			}
+			while (!endOfLine) {
+				char c = borderStream->sbumpc();
+				switch (c) {
+				case '\n':
+					// in case it's end of file '\n'
+					if (static_cast<int> (line.size()) < colsSize)
 					{
 						//case the line is shorter then boarder size
-						size_t spaceSize = boardSize - line.size();
+						size_t spaceSize = colsSize - line.size();
 						line.append(string(spaceSize, ' '));
 					}
 					line += '\0';
-					board[column] += line;
+					board[depth][row] += line;
 					endOfLine = true;
 					break;
-				}
-			default:
-				// take only 'sizeBoard' first chars
-				if (static_cast<int> (line.size()) < boardSize) {
-					if (!isKnownLetter(c)) {
-						c = ' ';
+				case '\r':
+					if (borderStream->sgetc() == '\n') {
+						// in case it's end of file '\r\n'
+						borderStream->sbumpc();
+						size_t lineSize = line.size();
+						if (static_cast<int> (lineSize) < colsSize)
+						{
+							//case the line is shorter then boarder size
+							size_t spaceSize = colsSize - line.size();
+							line.append(string(spaceSize, ' '));
+						}
+						line += '\0';
+						board[depth][row] += line;
+						endOfLine = true;
+						break;
 					}
-					line += c;
+				default:
+					// take only 'sizeBoard' first chars
+					if (static_cast<int> (line.size()) < colsSize) {
+						if (!isKnownLetter(c)) {
+							c = ' ';
+						}
+						line += c;
+					}
 				}
 			}
 		}
 	}
 	borderFile.close();
 }
+
 
 
 bool GameManager::isKnownLetter(char c) {
@@ -85,50 +94,61 @@ bool GameManager::validateBoard()
 	list<char> failedCharB;
 
 	//Insilize visit board
-	bool** visitBoard = new bool*[boardSize];
-	for (int i = 0; i < boardSize; i++) {
-		visitBoard[i] = new bool[boardSize];
-		for (int j = 0; j< boardSize; j++) {
-			visitBoard[i][j] = false;
+	bool*** visitBoard = new bool**[depthSize];
+	for (int i = 0; i < depthSize; i++) {
+		visitBoard[i] = new bool*[rowsSize];
+		for (int j = 0; j < rowsSize; j++) {
+			visitBoard[i][j] = new bool[colsSize];
+			for (int k = 0; k < colsSize; k++) {
+				visitBoard[i][j][k] = false;
+			}
 		}
 	}
 
 	// check spaces
 	bool adjacentError = false;
-	for (int i = 0; i < boardSize; i++) {
-		for (int j = 0; j < boardSize; j++) {
-			char c = board[i][j];
-			if (c == ' ') {
-				continue;
-			}
-			if (!isSpacesAreOK(i, j, c)) {
-				adjacentError = true;
-				break;
+	for (int i = 0; i < depthSize; i++) {
+		for (int j = 0; j < rowsSize; j++) {
+			for (int k = 0; k < colsSize; k++) {
+				char c = board[i][j][k];
+				if (c == ' ') {
+					continue;
+				}
+				if (!isSpacesAreOK(i, j, k, c)) {
+					adjacentError = true;
+					break;
+				}
 			}
 		}
 	}
 
 	//create boards and do checks
-	for (int row = 0; row < boardSize; row++) {
-		string boardRow = board[row];
-		for (int column = 0; column < boardSize; column++)
+	for (int depth = 0; depth < depthSize; depth++) {
+		string* boardDepthString = board[depth];
+		for (int row = 0; row < rowsSize; row++)
 		{
-			char shipChar = boardRow[column];
-			if (visitBoard[row][column]) {
-				continue;
-			}
-			if (shipChar == ' ')
-			{
-				visitBoard[row][column] = true;
-				continue;
-			}
+			string boardRowLength = boardDepthString[row];
+			for (int col = 0; col < colsSize; col++) {
+				char shipChar = boardRowLength[col];
+				if (visitBoard[depth][row][col]) {
+					continue;
+				}
+				if (shipChar == ' ')
+				{
+					visitBoard[depth][row][col] = true;
+					continue;
+				}
 
-			buildShip(row, column, shipChar, visitBoard, failedCharA, failedCharB);
+				buildShip(row, col, depth, shipChar, visitBoard, failedCharA, failedCharB);
+			}
 		}
 	}
 
 	//delete visitBoard;
-	for (int i = 0; i < boardSize; i++) {
+	for (int i = 0; i < depthSize; i++) {
+		for (int j = 0; j < rowsSize; j++) {
+			delete[] visitBoard[i][j];
+		}
 		delete[] visitBoard[i];
 	}
 	delete[] visitBoard;
@@ -179,13 +199,13 @@ bool GameManager::validateBoard()
 	return checksPass;
 }
 
-void GameManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list<char>& failedCharA, list<char>& failedCharB)
+void GameManager::buildShip( int x, int y, int z, char shipChar, bool*** visitBoard, list<char>& failedCharA, list<char>& failedCharB)
 {
 
 	if (shipChar == InflatableBoat::symbolAPlayer)
 	{
 		InflatableBoat* boat = new InflatableBoat();
-		shipCollectChars(x, y, shipChar, visitBoard, *boat);
+		shipCollectChars(x, y, z, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
@@ -203,7 +223,7 @@ void GameManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list
 	else if (shipChar == InflatableBoat::symbolBPlayer)
 	{
 		InflatableBoat* boat = new InflatableBoat();
-		shipCollectChars(x, y, shipChar, visitBoard, *boat);
+		shipCollectChars(x, y, z, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
@@ -221,7 +241,7 @@ void GameManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list
 	else if (shipChar == missileBoat::symbolAPlayer)
 	{
 		missileBoat* boat = new missileBoat();
-		shipCollectChars(x, y, shipChar, visitBoard, *boat);
+		shipCollectChars(x, y, z, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
@@ -240,7 +260,7 @@ void GameManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list
 	else if (shipChar == missileBoat::symbolBPlayer)
 	{
 		missileBoat* boat = new missileBoat();
-		shipCollectChars(x, y, shipChar, visitBoard, *boat);
+		shipCollectChars(x, y, z, shipChar, visitBoard, *boat);
 
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
@@ -258,7 +278,7 @@ void GameManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list
 	else if (shipChar == submarine::symbolAPlayer)
 	{
 		submarine* boat = new submarine();
-		shipCollectChars(x, y, shipChar, visitBoard, *boat);
+		shipCollectChars(x, y, z, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
@@ -275,7 +295,7 @@ void GameManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list
 	else if (shipChar == submarine::symbolBPlayer)
 	{
 		submarine* boat = new submarine();
-		shipCollectChars(x, y, shipChar, visitBoard, *boat);
+		shipCollectChars(x, y, z, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
@@ -292,7 +312,7 @@ void GameManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list
 	else if (shipChar == battleship::symbolAPlayer)
 	{
 		battleship* boat = new battleship();
-		shipCollectChars(x, y, shipChar, visitBoard, *boat);
+		shipCollectChars(x, y, z, shipChar, visitBoard, *boat);
 
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
@@ -310,7 +330,7 @@ void GameManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list
 	else if (shipChar == battleship::symbolBPlayer)
 	{
 		battleship* boat = new battleship();
-		shipCollectChars(x, y, shipChar, visitBoard, *boat);
+		shipCollectChars(x, y, z, shipChar, visitBoard, *boat);
 		bool isOk = (*boat).checkShape();
 		if (!isOk)
 		{
@@ -327,49 +347,79 @@ void GameManager::buildShip(int x, int y, char shipChar, bool** visitBoard, list
 }
 
 
-void GameManager::shipCollectChars(int x, int y, char shipChar, bool** visitBoard, Ship& ship) const {
-	visitBoard[x][y] = true;
+void GameManager::shipCollectChars(int x, int y, int z, char shipChar, bool*** visitBoard, Ship& ship) const {
+	visitBoard[z][x][y] = true;
 	ship.addPointToTheList(x, y);
 	int x_i = x + 1;
-	if (x_i >= 0 && x_i < boardSize && !visitBoard[x_i][y] && board[x_i][y] == shipChar)
+	if (x_i >= 0 && x_i < rowsSize && !visitBoard[z][x_i][y] && board[z][x_i][y] == shipChar)
 	{
-		shipCollectChars(x_i, y, shipChar, visitBoard, ship);
+		shipCollectChars(x_i, y, z, shipChar, visitBoard, ship);
 	}
 	int y_i = y + 1;
-	if (y_i >= 0 && y_i < boardSize && !visitBoard[x][y_i] && board[x][y_i] == shipChar)
+	if (y_i >= 0 && y_i < colsSize && !visitBoard[z][x][y_i] && board[z][x][y_i] == shipChar)
 	{
-		shipCollectChars(x, y_i, shipChar, visitBoard, ship);
+		shipCollectChars(x, y_i, z, shipChar, visitBoard, ship);
+	}
+	int z_i = z + 1;
+	if (z_i >= 0 && z_i < depthSize && !visitBoard[z_i][x][y] && board[z_i][x][y] == shipChar)
+	{
+		shipCollectChars(x, y, z_i, shipChar, visitBoard, ship);
 	}
 	x_i = x - 1;
-	if (x_i >= 0 && x_i < boardSize && !visitBoard[x_i][y] && board[x_i][y] == shipChar)
+	if (x_i >= 0 && x_i < rowsSize && !visitBoard[z][x_i][y] && board[z][x_i][y] == shipChar)
 	{
-		shipCollectChars(x_i, y, shipChar, visitBoard, ship);
+		shipCollectChars(x_i, y, z, shipChar, visitBoard, ship);
 	}
 	y_i = y - 1;
-	if (y_i >= 0 && y_i < boardSize && !visitBoard[x][y_i] && board[x][y_i] == shipChar)
+	if (y_i >= 0 && y_i < colsSize && !visitBoard[z][x][y_i] && board[z][x][y_i] == shipChar)
 	{
-		shipCollectChars(x, y_i, shipChar, visitBoard, ship);
+		shipCollectChars(x, y_i, z, shipChar, visitBoard, ship);
+	}
+	z_i = z - 1;
+	if (z_i >= 0 && z_i < depthSize && !visitBoard[z_i][x][y] && board[z_i][x][y] == shipChar)
+	{
+		shipCollectChars(x, y, z_i, shipChar, visitBoard, ship);
 	}
 }
 
-bool GameManager::isSpacesAreOK(int i, int j, char c) const
+bool GameManager::isSpacesAreOK(int x, int y, int z, char c) const
 {
-	if (!checkSpacesInPosition(i + 1, j, c)) { return false; }
-	if (!checkSpacesInPosition(i, j + 1, c)) { return false; }
-	if (!checkSpacesInPosition(i - 1, j, c)) { return false; }
-	if (!checkSpacesInPosition(i, j - 1, c)) { return false; }
-	//if (!checkSpacesInPosition(i-1, j-1, c)) { return false; }
-	//if (!checkSpacesInPosition(i+1, j+1, c)) { return false; }
-	//if (!checkSpacesInPosition(i+1, j-1, c)) { return false; }
-	//if (!checkSpacesInPosition(i-1, j+1, c)) { return false; }
+	if (!checkSpacesInPosition(x + 1, y, z, c)) { return false; }
+	if (!checkSpacesInPosition(x - 1, y, z, c)) { return false; }
+
+	if (!checkSpacesInPosition(x, y + 1, z, c)) { return false; }
+	if (!checkSpacesInPosition(x, y - 1, z, c)) { return false; }
+
+	if (!checkSpacesInPosition(x, y, z + 1, c)) { return false; }
+	if (!checkSpacesInPosition(x, y, z - 1, c)) { return false; }
 
 	return true;
 }
 
-bool GameManager::checkSpacesInPosition(int x, int y, char c) const
+bool GameManager::checkSpacesInPosition(int x, int y, int z, char c) const
 {
-	if (x > 0 && y > 0 && x < boardSize && y < boardSize && board[x][y] != c && board[x][y] != ' ') {
+	if (x > 0 && y > 0 && z > 0 && x < rowsSize && y < colsSize && z < depthSize && board[z][x][y] != c && board[z][x][y] != ' ') {
 		return false;
 	}
 	return true;
+}
+
+void GameManager::setAlgoA(IBattleshipGameAlgo * algo)
+{
+	this->playerAlgoA = algo;
+}
+
+void GameManager::setAlgoB(IBattleshipGameAlgo * algo)
+{
+	this->playerAlgoB = algo;
+}
+
+IBattleshipGameAlgo * GameManager::getAlgoA()
+{
+	return this->playerAlgoA;
+}
+
+IBattleshipGameAlgo * GameManager::getAlgoB()
+{
+	return this->playerAlgoB;
 }

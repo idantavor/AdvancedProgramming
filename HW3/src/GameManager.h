@@ -36,48 +36,37 @@ using namespace std;
 
 class GameManager {
 public:
-	int boardWidth;
-	int boardLength;
-	int boardDepth;
-	string* board;
-	UserFleet userFleetA;
-	UserFleet userFleetB;
+	int rowsSize = 0;
+	int colsSize = 0;
+	int depthSize = 0; 
+	string** board;
+	UserFleet fleetA;
+	UserFleet fleetB;
 	
 
-	bool loadBoard(std::list<string> boardPath) const;
+	bool loadBoard(string boardPath);
 
 	bool isKnownLetter(char c);
 
 	bool validateBoard();
 
-	void buildShip(int x, int y, char shipChar, bool ** visitBoard, list<char>& failedCharA, list<char>& failedCharB);
+	void buildShip(int x, int y, int z, char shipChar, bool *** visitBoard, list<char>& failedCharA, list<char>& failedCharB);
 
-	void shipCollectChars(int x, int y, char shipChar, bool ** visitBoard, Ship & ship) const;
+	void shipCollectChars(int x, int y, int z, char shipChar, bool *** visitBoard, Ship & ship) const;
 
-	bool isSpacesAreOK(int i, int j, char c) const;
+	bool isSpacesAreOK(int depth, int length, int width, char c) const;
 
-	bool checkSpacesInPosition(int x, int y, char c) const;
+	bool checkSpacesInPosition(int x, int y, int z, char c) const;
 
-	void setAlgoA(IBattleshipGameAlgo* algo) {
-		playerAlgoA = algo;
-	}
-	void setAlgoB(IBattleshipGameAlgo* algo) {
-		playerAlgoB = algo;
-	}
 
-	IBattleshipGameAlgo* getAlgoA() {
-		return playerAlgoA;
-	}
-
-	IBattleshipGameAlgo* getAlgoB() {
-		return playerAlgoB;
-	}
-
+	void setAlgoA(IBattleshipGameAlgo* algo);
+	void setAlgoB(IBattleshipGameAlgo* algo);
+	IBattleshipGameAlgo* getAlgoA();
+	IBattleshipGameAlgo* getAlgoB();
 
 private:
 	IBattleshipGameAlgo* playerAlgoA = nullptr;
 	IBattleshipGameAlgo* playerAlgoB = nullptr;
-	string* board;
 
 };
 #endif

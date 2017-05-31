@@ -15,9 +15,13 @@ using namespace std;
 class UserGameData : public BoardData
 {
 	public:
-		UserFleet fleet;
-		~UserGameData() = default;
-		char charAt(Coordinate c) const = 0;  //returns only selected players' chars
+		UserGameData(int playerNumber, string* board);
+		char charAt(Coordinate c) const override;  //returns only selected players' chars
+		
+	private:
+		string* board;
+		int palyerNumber;
+
 };
 #endif
 

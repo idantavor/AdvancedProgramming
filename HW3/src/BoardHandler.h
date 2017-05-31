@@ -3,18 +3,17 @@
 #define BOARD_HANDLER
 #include <string>
 #include <list>
+#include "GameManager.h"
+
 using namespace std;
 
 class BoardHandler {
 public:
-	BoardHandler(string* board) {
-		this->board = board;
+	BoardHandler(std::list<string> boardPaths) {
+		this->boardPaths = boardPaths;
 	}
-	bool loadBoard(std::list<string> boardsPath) const;
+	bool loadBoards(std::list<string> boardPaths) const;
 
-private:
-	bool checkAndLoadBoard(const string& boardPath) const;
-	string* board;
-
+	std::list<string> boardPaths;
 };
 #endif
