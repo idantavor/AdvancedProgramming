@@ -8,6 +8,10 @@
 #include <vector>
 #include <direct.h>
 #include "UserFleet.h"
+#define PLAYER_A 0
+#define PLAYER_B 1
+#define SPACE ' '
+
 
 
 using namespace std;
@@ -15,11 +19,11 @@ using namespace std;
 class UserGameData : public BoardData
 {
 	public:
-		UserGameData(int playerNumber, string* board);
+		UserGameData(int playerNumber, string** board);
 		char charAt(Coordinate c) const override;  //returns only selected players' chars
 		
 	private:
-		string* board;
+		string** board;
 		int palyerNumber;
 
 };

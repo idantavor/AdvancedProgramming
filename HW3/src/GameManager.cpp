@@ -349,7 +349,7 @@ void GameManager::buildShip( int x, int y, int z, char shipChar, bool*** visitBo
 
 void GameManager::shipCollectChars(int x, int y, int z, char shipChar, bool*** visitBoard, Ship& ship) const {
 	visitBoard[z][x][y] = true;
-	ship.addPointToTheList(x, y);
+	ship.addPointToTheList(x, y, z);
 	int x_i = x + 1;
 	if (x_i >= 0 && x_i < rowsSize && !visitBoard[z][x_i][y] && board[z][x_i][y] == shipChar)
 	{
