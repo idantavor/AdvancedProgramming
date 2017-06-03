@@ -93,7 +93,7 @@ bool Ship::checkShape()
 		}
 
 	}
-	if((countX> 1 && (countY > 1 || countZ> 1)) || (countZ > 1|| countY > 1 )){
+	if((countX> 1 && (countY > 1 || countZ> 1)) || (countZ > 1 && countY > 1 )){
 		return false;
 
 	}

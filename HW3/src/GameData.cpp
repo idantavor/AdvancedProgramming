@@ -1,95 +1,19 @@
-#include "GameManager.h"
+#include "GameData.h"
 
-bool GameManager::loadBoard(string boardPath)
+
+
+bool GameData::loadAndValidateBoard(const string boardPath)
 {
-	ifstream borderFile(boardPath);
-
-	// The characters in the stream are read one-by-one using a std::streambuf.
-	// That is faster than reading them one-by-one using the std::istream.
-	streambuf* borderStream = borderFile.rdbuf();
-
-	// Get board sizes
-	string sizesLine;
-	istream isBoard(borderStream);
-	getline(isBoard, sizesLine);
-
-	depthSize = 0;
-	rowsSize = 0;
-	colsSize = 0;
-
-	board = new string*[depthSize];
-	string emptyLine;
-	for (auto depth = 0; depth < depthSize; depth++) {
-		getline(isBoard, emptyLine);
-		board = new string*[rowsSize];
-		for (auto row = 0; row < rowsSize; row++) {
-			auto endOfLine = false;
-			string line = "";
-			if (borderStream->sgetc() == EOF)
-			{
-				line.append(string(colsSize, ' '));
-				line += '\0';
-				board[depth][row] = line;
-				continue;
-			}
-			while (!endOfLine) {
-				char c = borderStream->sbumpc();
-				switch (c) {
-				case '\n':
-					// in case it's end of file '\n'
-					if (static_cast<int> (line.size()) < colsSize)
-					{
-						//case the line is shorter then boarder size
-						size_t spaceSize = colsSize - line.size();
-						line.append(string(spaceSize, ' '));
-					}
-					line += '\0';
-					board[depth][row] += line;
-					endOfLine = true;
-					break;
-				case '\r':
-					if (borderStream->sgetc() == '\n') {
-						// in case it's end of file '\r\n'
-						borderStream->sbumpc();
-						size_t lineSize = line.size();
-						if (static_cast<int> (lineSize) < colsSize)
-						{
-							//case the line is shorter then boarder size
-							size_t spaceSize = colsSize - line.size();
-							line.append(string(spaceSize, ' '));
-						}
-						line += '\0';
-						board[depth][row] += line;
-						endOfLine = true;
-						break;
-					}
-				default:
-					// take only 'sizeBoard' first chars
-					if (static_cast<int> (line.size()) < colsSize) {
-						if (!isKnownLetter(c)) {
-							c = ' ';
-						}
-						line += c;
-					}
-				}
-			}
-		}
+	BoardParser parser(boardPath);
+	board = parser.loadBoard();
+	if(board == nullptr){
+		return false;
 	}
-	borderFile.close();
-}
 
+	depthSize = parser.getDepthSize();
+	rowsSize = parser.getRowSize();
+	colsSize = parser.getColSize();
 
-
-bool GameManager::isKnownLetter(char c) {
-
-	return (c == InflatableBoat::symbolAPlayer || c == InflatableBoat::symbolBPlayer ||
-		c == missileBoat::symbolAPlayer || c == missileBoat::symbolBPlayer ||
-		c == submarine::symbolAPlayer || c == submarine::symbolBPlayer ||
-		c == battleship::symbolAPlayer || c == battleship::symbolBPlayer);
-}
-
-bool GameManager::validateBoard()
-{
 	list<char> failedCharA;
 	list<char> failedCharB;
 
@@ -169,37 +93,24 @@ bool GameManager::validateBoard()
 		WRONG_SIZE_B(*it);
 	}
 
-	if (fleetA.getNumberOfShips() > NUMBR_OF_SHIPS)
-	{
-		cout << TOO_MANY_A;
-		checksPass = false;
-	}
-	if (fleetA.getNumberOfShips() < NUMBR_OF_SHIPS)
-	{
-		cout << TOO_FEW_A;
-		checksPass = false;
-	}
-	if (fleetB.getNumberOfShips() > NUMBR_OF_SHIPS)
-	{
-		cout << TOO_MANY_B;
-		checksPass = false;
-	}
-	if (fleetB.getNumberOfShips() < NUMBR_OF_SHIPS)
-	{
-		cout << TOO_FEW_B;
-		checksPass = false;
-	}
-
 	if (adjacentError)
 	{
 		cout << ADJACENT;
 		checksPass = false;
 	}
 
+	for (int i = 0; i < depthSize; i++) {
+		cout << "new" << endl;
+		cout  << endl;
+		for (int j = 0; j < rowsSize; j++) {
+			cout << board[i][j] << endl;
+		}
+	}
+
 	return checksPass;
 }
 
-void GameManager::buildShip( int x, int y, int z, char shipChar, bool*** visitBoard, list<char>& failedCharA, list<char>& failedCharB)
+void GameData::buildShip( int x, int y, int z, char shipChar, bool*** visitBoard, list<char>& failedCharA, list<char>& failedCharB)
 {
 
 	if (shipChar == InflatableBoat::symbolAPlayer)
@@ -347,7 +258,7 @@ void GameManager::buildShip( int x, int y, int z, char shipChar, bool*** visitBo
 }
 
 
-void GameManager::shipCollectChars(int x, int y, int z, char shipChar, bool*** visitBoard, Ship& ship) const {
+void GameData::shipCollectChars(int x, int y, int z, char shipChar, bool*** visitBoard, Ship& ship) const {
 	visitBoard[z][x][y] = true;
 	ship.addPointToTheList(x, y, z);
 	int x_i = x + 1;
@@ -382,7 +293,7 @@ void GameManager::shipCollectChars(int x, int y, int z, char shipChar, bool*** v
 	}
 }
 
-bool GameManager::isSpacesAreOK(int x, int y, int z, char c) const
+bool GameData::isSpacesAreOK(int x, int y, int z, char c) const
 {
 	if (!checkSpacesInPosition(x + 1, y, z, c)) { return false; }
 	if (!checkSpacesInPosition(x - 1, y, z, c)) { return false; }
@@ -396,7 +307,7 @@ bool GameManager::isSpacesAreOK(int x, int y, int z, char c) const
 	return true;
 }
 
-bool GameManager::checkSpacesInPosition(int x, int y, int z, char c) const
+bool GameData::checkSpacesInPosition(int x, int y, int z, char c) const
 {
 	if (x > 0 && y > 0 && z > 0 && x < rowsSize && y < colsSize && z < depthSize && board[z][x][y] != c && board[z][x][y] != ' ') {
 		return false;
@@ -404,22 +315,33 @@ bool GameManager::checkSpacesInPosition(int x, int y, int z, char c) const
 	return true;
 }
 
-void GameManager::setAlgoA(IBattleshipGameAlgo * algo)
+GameData::~GameData()
+{
+	cout << "dis" << endl;
+	if (board != nullptr) {
+		for (int i = 0; i < depthSize; i++) {
+			delete[] board[i];
+		}
+		delete[] board;
+	}
+}
+
+void GameData::setAlgoA(IBattleshipGameAlgo * algo)
 {
 	this->playerAlgoA = algo;
 }
 
-void GameManager::setAlgoB(IBattleshipGameAlgo * algo)
+void GameData::setAlgoB(IBattleshipGameAlgo * algo)
 {
 	this->playerAlgoB = algo;
 }
 
-IBattleshipGameAlgo * GameManager::getAlgoA()
+IBattleshipGameAlgo * GameData::getAlgoA()
 {
 	return this->playerAlgoA;
 }
 
-IBattleshipGameAlgo * GameManager::getAlgoB()
+IBattleshipGameAlgo * GameData::getAlgoB()
 {
 	return this->playerAlgoB;
 }

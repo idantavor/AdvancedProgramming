@@ -7,28 +7,25 @@
 #include <string>
 #include <vector>
 #include <direct.h>
+#include "GameData.h"
+
 
 
 using namespace std;
 
 class BattleManager {
-		vector<string> filePaths;
 
 	static IBattleshipGameAlgo* loadFromDLL(string path);
 
 	public:
-		~BattleManager() {
+		~BattleManager();
+		bool validateFilesExistance(const std::string & dirPath = "");
+		void loadBoardsInToGameManager(std::list<string> boardPaths);
+		//bool runBattle(const string& dirPath);
 
-		}
-		BattleManager()
-		{
-			
-		}
+		std::list<GameData*> gamesList;
+		std::list<string> dllFiels;
 
-
-	bool validateFilesExistanceAndBoardValidate(const std::string& dirPath = "");
-	bool runBattle(const string& dirPath);
-	void deleteBoard(char** boardToDelete) const;
 };
 #endif
 

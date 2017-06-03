@@ -5,7 +5,7 @@
 class UserFleet
 {
 	public:
-	UserFleet();
+	UserFleet()= default;
 	~UserFleet();
 	std::pair<AttackResult, Ship*> UserFleet::executeAttack(Position & p) ;
 		bool isNotLose();
