@@ -38,7 +38,7 @@ bool GameData::loadAndValidateBoard(const string boardPath)
 				if (c == ' ') {
 					continue;
 				}
-				if (!isSpacesAreOK(i, j, k, c)) {
+				if (!isSpacesAreOK( j, k, i, c)) {
 					adjacentError = true;
 					break;
 				}
