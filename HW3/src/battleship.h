@@ -24,6 +24,8 @@ class battleship : public Ship
 			return symbolBPlayer;
 		}
 
+		battleship* clone() override;
+
 		static char symbolAPlayer;
 		static char symbolBPlayer;
 		static int length;

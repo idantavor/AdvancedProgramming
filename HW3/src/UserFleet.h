@@ -11,6 +11,7 @@ class UserFleet
 		bool isNotLose();
 		size_t getNumberOfShips() const;
 		void addShipToList(Ship* ship);
+		void clone(UserFleet& fleet);
 	protected:
 		std::list<Ship*> shipsList;
 		
