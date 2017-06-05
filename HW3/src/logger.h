@@ -7,30 +7,30 @@
 #include <iostream>
 
 using namespace std;
-class Logger {
+class InnerLogger {
 
 private:
 	mutex logWriteMutex;
 	ofstream logFile;
-	Logger() {
+	InnerLogger() {
 		logFile.open("game.log");
 	};
-	void writeMessage(string severity, string messege) {
+	void writeMessage(string severity, string moduleName, string message) {
 		logWriteMutex.lock();
-		logFile << getDateTime() << " | " << severity << " : " << messege << endl;
+		logFile << getDateTime() << " | " << moduleName << " | " << severity << " : " << message << endl;
 		logWriteMutex.unlock();
 	}
 
 public:
-	Logger(Logger const&) = delete;
-	
-	void operator=(Logger const&)=delete;
-	
-	static Logger& getInstnace() {
-		static Logger instance;
+	InnerLogger(InnerLogger const&) = delete;
+
+	void operator=(InnerLogger const&) = delete;
+
+	static InnerLogger& getInstnace() {
+		static InnerLogger instance;
 		return instance;
 	}
-	static string getDateTime() { 
+	static string getDateTime() {
 		time_t     now = time(0);
 		struct tm  tstruct;
 		char       buf[80];
@@ -38,18 +38,18 @@ public:
 		strftime(buf, sizeof(buf), "%d-%m-%Y | %X", &tstruct);
 		return buf;
 	}
-	
-	void Info(string message) {
-		this->writeMessage("INFO",message);
+
+	void Info(string moduleName, string message) {
+		this->writeMessage("INFO", moduleName, message);
 	}
-	void Error(string message) {
-		this->writeMessage("ERROR", message);
+	void Error(string moduleName, string message) {
+		this->writeMessage("ERROR", moduleName, message);
 	}
-	void Warning(string message) {
-		this->writeMessage("WARNING", message);
+	void Warning(string moduleName, string message) {
+		this->writeMessage("WARNING", moduleName, message);
 	}
 
-	~Logger() {
+	~InnerLogger() {
 		logFile.flush();
 		logFile.close();
 	}
@@ -59,3 +59,22 @@ public:
 
 
 };
+
+class Logger {
+private:
+	string moduleName;
+public:
+	Logger(string _moduleName) :moduleName(_moduleName) { };
+	void Info(string message) {
+		InnerLogger::getInstnace().Info(this->moduleName, message);
+	}
+	void Error( string message) {
+		InnerLogger::getInstnace().Error(this->moduleName, message);
+	}
+	void Warning( string message) {
+		InnerLogger::getInstnace().Warning(this->moduleName, message);
+	}
+
+};
+
+
