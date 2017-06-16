@@ -23,8 +23,8 @@ bool SharedBoard::loadBoard()
 
 	bool endOfBoard = false;
 	bool firstBoard = true;
-	int countRowsInBord = 0;
-	int depth = 0;
+	unsigned int countRowsInBord = 0;
+	unsigned int depth = 0;
 	bool emptyLine = false;
 
 	while (depth < depthSize) {
@@ -110,7 +110,7 @@ string SharedBoard::getNextLine(streambuf* borderStream) {
 
 	return line;
 }
-void SharedBoard::addRowsToBoard(int depth, int countRowsInBord) {
+void SharedBoard::addRowsToBoard(unsigned int  depth, unsigned int countRowsInBord) {
 
 	string line;
 	while (countRowsInBord < rowsSize) {
@@ -122,12 +122,12 @@ void SharedBoard::addRowsToBoard(int depth, int countRowsInBord) {
 	}
 }
 
-void SharedBoard::addTableToBoard(int depth) {
+void SharedBoard::addTableToBoard(unsigned int depth) {
 
 	string line;
 	while (depth < depthSize) {
 		board[depth] = new string[rowsSize];
-		for (int row = 0; row < rowsSize; row++) {
+		for (unsigned int  row = 0; row < rowsSize; row++) {
 			line = "";
 			line.append(string(colsSize, SPACE));
 			board[depth][row] = line;
@@ -136,10 +136,10 @@ void SharedBoard::addTableToBoard(int depth) {
 	}
 }
 
-void SharedBoard::addLineToBoard(string& line, int depth, int countRowsInBord) {
+void SharedBoard::addLineToBoard(string& line, unsigned int depth, unsigned int countRowsInBord) {
 
 	string rowLine;
-	int charIndex = 0;
+	unsigned int charIndex = 0;
 	char c;
 	while (charIndex < rowsSize && charIndex < line.size()) {
 		c = line[charIndex];
@@ -154,7 +154,7 @@ void SharedBoard::addLineToBoard(string& line, int depth, int countRowsInBord) {
 	if (rowLine.size() < colsSize)
 	{
 		//case the line is shorter then boarder size
-		size_t spaceSize = colsSize - rowLine.size();
+		unsigned int spaceSize = colsSize - rowLine.size();
 		rowLine.append(string(spaceSize, SPACE));
 
 	}
@@ -164,7 +164,7 @@ void SharedBoard::addLineToBoard(string& line, int depth, int countRowsInBord) {
 void SharedBoard::initializeBoard() {
 
 	board = new string*[depthSize];
-	for (int depth = 0; depth < depthSize; depth++) {
+	for (unsigned int  depth = 0; depth < depthSize; depth++) {
 		board[depth] = new string[rowsSize];
 	}
 }
@@ -190,7 +190,7 @@ bool SharedBoard::handleSizesLine(streambuf* borderStream) {
 
 	//Check first line (sizes)
 	string line = getNextLine(borderStream);
-	for (int i = 0; i < line.size(); i++) {
+	for (unsigned int  i = 0; i < line.size(); i++) {
 		c = line[i];
 		if (isdigit(c)) {
 			size += c;
@@ -251,24 +251,24 @@ SharedBoard::~SharedBoard()
 {
 	cout << "dis" << endl;
 	if (board != nullptr) {
-		for (int i = 0; i < depthSize; i++) {
+		for (unsigned int  i = 0; i < depthSize; i++) {
 			delete[] board[i];
 		}
 		delete[] board;
 	}
 }
 
-unsigned int SharedBoard::getRowSize()
+unsigned int  SharedBoard::getRowSize()
 {
 	return rowsSize;
 }
 
-unsigned int SharedBoard::getDepthSize()
+unsigned int  SharedBoard::getDepthSize()
 {
 	return depthSize;
 }
 
-unsigned int SharedBoard::getColSize()
+unsigned int  SharedBoard::getColSize()
 {
 	return colsSize;
 }

@@ -31,8 +31,8 @@ void logicTest(vector<std::string> &dlls,vector<std::string> &games) {
 	std::unordered_map<int, vector<pair<int, int>>> combinationMap;
 	std::vector<std::tuple<std::string, std::string, std::string>> result;
 	//build all player combinations
-	for (int i = 0; i<dlls.size(); i++) {
-		for (int j = 0; j < dlls.size(); j++) {
+	for (size_t  i = 0; i<dlls.size(); i++) {
+		for (size_t  j = 0; j < dlls.size(); j++) {
 			if (i == j)continue;
 			if (combinationMap.find(i) != combinationMap.end()) {
 				combinationMap.find(i)->second.push_back({ i,j });
@@ -46,8 +46,8 @@ void logicTest(vector<std::string> &dlls,vector<std::string> &games) {
 	}
 	//add to ThreadPool queue all of the battles in an even way
 	for (auto itr = games.cbegin(); itr != games.cend(); itr++) {
-		for (int i = 0; i < dlls.size() - 1; i++) {// i will be each dll combination index
-			for (int j = 0; j < dlls.size(); j++) {
+		for (size_t  i = 0; i < dlls.size() - 1; i++) {// i will be each dll combination index
+			for (size_t  j = 0; j < dlls.size(); j++) {
 				pair<int, int> combination = combinationMap.find(j)->second.at(i);
 				result.push_back(std::tuple<std::string,std::string,std::string>{ dlls.at(combination.first),dlls.at(combination.second), *itr });
 			}
