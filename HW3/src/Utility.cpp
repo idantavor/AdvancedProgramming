@@ -74,4 +74,3 @@ bool Utility::has_suffix(const std::string &str, const std::string &suffix)
 
 
 
-

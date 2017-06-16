@@ -1,10 +1,11 @@
 #include "BattleThreadPool.h"
 #include "UserGameData.h"
+#include "Utility.h"
 
 
-bool operator==(Coordinate &a, Coordinate&b) {
-	return a.col == b.col && a.depth == b.depth && a.row == b.row;
-}
+//bool operator==(Coordinate &a, Coordinate&b) {
+//	return a.col == b.col && a.depth == b.depth && a.row == b.row;
+//}
 
 bool BattleThreadPool::runBattle(AlgoDLL *dllA, AlgoDLL *dllB, GameData *bd)
 {
