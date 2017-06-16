@@ -8,6 +8,7 @@
 #include <algorithm>  
 #include <time.h>
 
+
 //GENERAL NOTICE
 //all public functions (which are part of the "interface") reccieve and send postions starting from 1
 //all private functions "talk" in real indexes - staring from 0 ...
@@ -25,7 +26,7 @@ using namespace std;
 
 #define EMPTY_PLACE ' '
 
-#define PAIR_NO_MATCH std::pair<int,int>(-1,-1)
+#define CORD_NO_MATCH Coordinate(-1,-1,-1)
 
 enum class AttackDirection {
 	UP, DOWN, RIGHT,LEFT
@@ -36,40 +37,49 @@ public:
 	BattleShipGameSmartAlgo();
 	~BattleShipGameSmartAlgo();
 
+	void setPlayer(int player);
 	//here i assume receiving only my player's boats....
-	void setBoard(int player, const char** board, int numRows, int numCols);		// called once to notify player on his board, 
+	void setBoard(const BoardData& board);		// called once to notify player on his board, 
 
 	bool init(const std::string& path);
-	std::pair<int, int> attack(); // ask player for his move retruns <row,col>, <-1,-1> if no valid attack is found
-	void notifyOnAttackResult(int player, int row, int col, AttackResult result); // notify on last move result
+	Coordinate attack(); // ask player for his move retruns <row,col>, <-1,-1> if no valid attack is found
+	void notifyOnAttackResult(int player, Coordinate move, AttackResult result); // last move result
 
 private:
+	//members
+	static const Coordinate deltaCords[3];
 	int m_rowNum;
 	int m_colNum;
+	int m_depthNum;
 	int m_player;
-	int m_mode; // search or destroy
-	char** m_board; //the board the algo uses
-
-	list<set<std::pair<int, int>>> m_shipsUnderAttack;
-	set<std::pair<int, int>> m_myShips;
+	int m_mode;	// search or destroy
+	char*** m_statusBoard; //the game's state in the eyes of the algo
+	int***	m_probBoard; //possible ships in this square
+	list<set<Coordinate>> m_shipsUnderAttack;
+	list<int> m_leftShipsOfOpponent;
+	set<Coordinate> m_myShips;
 	AttackDirection m_direction;
 
-	std::pair<int, int> getNextDestroyPosition();
+	Coordinate& getNextDestroyPosition();
+	void addAttackedPointToShipsList(Coordinate& attackedPoint);//addes the attacked point to the list of ships, either to an existing ship, or creates a new one
+	void removeSunkShipFromShipsListAndMarkPlacesAsSunk(Coordinate& attackedPoint);
+	Coordinate& getSearchPoint();
+	bool checkSurrondingPoint(Coordinate& c);//makes sure that a point is eithr out of range, or does not contain a ship, or is part of the attacked ship 
+	bool isInBoard(Coordinate& c);
+	std::pair<int, int> getMinMax(set<Coordinate>& setOfPoints, char rowOrColOrDepth); //retruns the <min,max> row/col/depth in the set. 'r' for row, 'c' for col 'd' for depth
+	set <Coordinate>* getShipUnderAttack(); // returns the first ship under attack, or NULL if such one does not exist
+	void tryToPlaceShip(int shipSize); // tries to place a ship in the given stating position
+	bool validatePoint(Coordinate& c);  //checks if this position can contain a ship, only relevant during search mode,
+	void zeroProbBoard();
 
-	std::vector<std::pair<int, int>>* getPossibleAttackPositions();
-
-	void addAttackedPointToShipsList(std::pair<int, int>& attackedPoint);//addes the attacked point to the list of ships, either to an existing ship, or creates a new one
-	void removeSunkShipFromShipsListAndMarkPlacesAsSunk(std::pair<int, int>& attackedPoint);
-
-	bool isAttackable(const std::pair<int, int>& rowCol);
-
-	bool checkSinglePoint(const std::pair<int, int>& rowCol);//makes sure that a point is eithr out of range, or does not contain a ship, or is part of the attacked ship 
-
-	bool isInBoard(const std::pair<int, int>& rowCol);
-	std::pair<int, int> getMinMax(set<std::pair<int, int>>& setOfPoints, char rowOrCol); //retruns the <min,max> row/col in the set. 'r' for row, 'c' for col
-	std::pair<int, int> fromRepresntToRealIndex(int row, int col);
-	std::pair<int, int> fromRealIndexToRepresnt(std::pair<int, int> rowCol);//converting from real indexes s.a 0,0 to Represenable indexes 1,1
-	set < std::pair<int, int>>* getShipUnderAttack(); // returns the first ship under attack, or NULL if such one does not exist
-	bool areAdjacent(const std::pair<int, int>& p1, const std::pair<int, int>& p2);//returns true if the points are next to each other, false o.w
-	bool areShipsAdjacent(const set<std::pair<int, int>>& p1, const set<std::pair<int, int>>& p2);
+	//static functions
+	static bool areAdjacent(const Coordinate& p1, const Coordinate& p2);//returns true if the points are next to each other, false o.w
+	static bool areShipsAdjacent(const set<Coordinate>& s1, const set<Coordinate>& s2);
+	static Coordinate& fromRepresntToRealIndex(const Coordinate& c);
+	static Coordinate& fromRealIndexToRepresnt(const Coordinate& c);
+	static void countShips(const BoardData& bd, list<int>& listToFill);
+	static void addToList(int item, int times, list<int>& l);
+	template <class T>
+	static void free3dArray(T*** arr, int d1, int d2 );
 };
+

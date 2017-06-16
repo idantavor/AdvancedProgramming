@@ -321,7 +321,6 @@ void GameData::clone(GameData & cloned)
 	fleetA.clone(cloned.fleetA);
 	fleetB.clone(cloned.fleetB);
 	cloned.board = board;
-
 }
 
 

@@ -8,6 +8,8 @@
 #include <vector>
 #include <direct.h>
 #include "GameData.h"
+#include "TournamentReporter.h"
+#include "BattleThreadPool.h"
 
 
 
@@ -15,16 +17,22 @@ using namespace std;
 
 class BattleManager {
 
-	static IBattleshipGameAlgo* loadFromDLL(string path);
+private:
+	TournamentReporter tRporter;
+	BattleThreadPool threadPool;
+	vector<AlgoDLL> algorithms;
+	int threadNum = 0;
+	void buildBattlesQueue();
+public:
+	BattleManager(string boardPaths, int numOfThreads = 4);
+	~BattleManager();
+	bool validateFilesExistance(const std::string & dirPath = "");
+	void loadBoardsInToGameManager(std::list<string> boardPaths);
+	//bool runBattle(const string& dirPath);
 
-	public:
-		~BattleManager();
-		bool validateFilesExistance(const std::string & dirPath = "");
-		void loadBoardsInToGameManager(std::list<string> boardPaths);
-		//bool runBattle(const string& dirPath);
-
-		std::list<GameData*> gamesList;
-		std::list<string> dllFiels;
+	std::list<GameData*> gamesList;
+	std::list<string> dllFilePaths;
+	void startTournament();
 
 };
 #endif
