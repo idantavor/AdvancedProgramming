@@ -23,6 +23,8 @@ class submarine :public Ship
 			return symbolBPlayer;
 		}
 
+		submarine* clone() override;
+
 
 		static char symbolAPlayer;
 		static char symbolBPlayer;

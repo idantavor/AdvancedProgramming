@@ -1,7 +1,7 @@
-#include "BoardParser.h"
+#include "SharedBoard.h"
 
 
-string** BoardParser::loadBoard()
+bool SharedBoard::loadBoard()
 {
 	ifstream borderFile(boardPath);
 	string line;
@@ -11,12 +11,12 @@ string** BoardParser::loadBoard()
 	streambuf* borderStream = borderFile.rdbuf();
 
 	if (!handleSizesLine(borderStream)) {
-		return nullptr;
+		return false;
 	}
 
 	line = getNextLine(borderStream);
 	if (!line.empty()) {
-		return nullptr;
+		return false;
 	}
 
 	initializeBoard();
@@ -31,7 +31,7 @@ string** BoardParser::loadBoard()
 		if (endOfFile) {
 			emptyLine = true;
 		}
-		else{
+		else {
 			line = getNextLine(borderStream);
 			emptyLine = line.empty();
 		}
@@ -84,15 +84,15 @@ string** BoardParser::loadBoard()
 
 	borderFile.close();
 
-	return board;
+	return true;
 }
 
-string BoardParser::getNextLine(streambuf* borderStream) {
+string SharedBoard::getNextLine(streambuf* borderStream) {
 	string line = "";
 	while (true) {
 		char c = borderStream->sbumpc();
 		// read until line is ended
-		if (c == '\n'){
+		if (c == '\n') {
 			break;
 		}
 		else if (c == EOF) {
@@ -110,7 +110,7 @@ string BoardParser::getNextLine(streambuf* borderStream) {
 
 	return line;
 }
-void BoardParser::addRowsToBoard(int depth, int countRowsInBord) {
+void SharedBoard::addRowsToBoard(int depth, int countRowsInBord) {
 
 	string line;
 	while (countRowsInBord < rowsSize) {
@@ -122,7 +122,7 @@ void BoardParser::addRowsToBoard(int depth, int countRowsInBord) {
 	}
 }
 
-void BoardParser::addTableToBoard(int depth) {
+void SharedBoard::addTableToBoard(int depth) {
 
 	string line;
 	while (depth < depthSize) {
@@ -136,7 +136,7 @@ void BoardParser::addTableToBoard(int depth) {
 	}
 }
 
-void BoardParser::addLineToBoard(string& line, int depth, int countRowsInBord) {
+void SharedBoard::addLineToBoard(string& line, int depth, int countRowsInBord) {
 
 	string rowLine;
 	int charIndex = 0;
@@ -161,7 +161,7 @@ void BoardParser::addLineToBoard(string& line, int depth, int countRowsInBord) {
 	board[depth][countRowsInBord] = rowLine;
 }
 
-void BoardParser::initializeBoard() {
+void SharedBoard::initializeBoard() {
 
 	board = new string*[depthSize];
 	for (int depth = 0; depth < depthSize; depth++) {
@@ -169,7 +169,7 @@ void BoardParser::initializeBoard() {
 	}
 }
 
-bool BoardParser::addCharToString(string& line, char c) {
+bool SharedBoard::addCharToString(string& line, char c) {
 
 	if (line.size() < colsSize)
 	{
@@ -180,7 +180,7 @@ bool BoardParser::addCharToString(string& line, char c) {
 	return false;
 }
 
-bool BoardParser::handleSizesLine(streambuf* borderStream) {
+bool SharedBoard::handleSizesLine(streambuf* borderStream) {
 	// Get board sizes
 	string size = "";
 	vector<string> sizes;
@@ -204,7 +204,7 @@ bool BoardParser::handleSizesLine(streambuf* borderStream) {
 		}
 	}
 
-	
+
 	if (!size.empty()) {
 		sizes.push_back(size);
 	}
@@ -234,7 +234,7 @@ bool BoardParser::handleSizesLine(streambuf* borderStream) {
 
 	return true;
 }
-bool BoardParser::isKnownLetter(char c) {
+bool SharedBoard::isKnownLetter(char c) {
 
 	return (c == InflatableBoat::symbolAPlayer || c == InflatableBoat::symbolBPlayer ||
 		c == missileBoat::symbolAPlayer || c == missileBoat::symbolBPlayer ||
@@ -242,22 +242,38 @@ bool BoardParser::isKnownLetter(char c) {
 		c == battleship::symbolAPlayer || c == battleship::symbolBPlayer);
 }
 
-BoardParser::BoardParser(string boardPath)
+SharedBoard::SharedBoard(string boardPath)
 {
 	this->boardPath = boardPath;
 }
 
-unsigned int BoardParser::getRowSize()
+SharedBoard::~SharedBoard()
+{
+	cout << "dis" << endl;
+	if (board != nullptr) {
+		for (int i = 0; i < depthSize; i++) {
+			delete[] board[i];
+		}
+		delete[] board;
+	}
+}
+
+unsigned int SharedBoard::getRowSize()
 {
 	return rowsSize;
 }
 
-unsigned int BoardParser::getDepthSize()
+unsigned int SharedBoard::getDepthSize()
 {
 	return depthSize;
 }
 
-unsigned int BoardParser::getColSize()
+unsigned int SharedBoard::getColSize()
 {
 	return colsSize;
+}
+
+char SharedBoard::getCharAt(int x, int y, int z)
+{
+	return board[z][x][y];
 }

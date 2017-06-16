@@ -6,11 +6,11 @@
 #include "Ship.h"
 #include "UserFleet.h"
 #include "InflatableBoat.h"
+#include "SharedBOard.h"
 #include "battleship.h"
 #include "submarine.h"
 #include "missileBoat.h"
 #include "Utility.h"
-#include "BoardParser.h"
 #include <functional>
 #include <memory>
 #include "dirent.h"
@@ -33,22 +33,20 @@ using namespace std;
 
 class GameData {
 public:
-	unsigned int rowsSize = 0;
-	unsigned int colsSize = 0;
-	unsigned int depthSize = 0;
-	string** board = nullptr;
+	std::shared_ptr<SharedBoard> board;
 	UserFleet fleetA;
 	UserFleet fleetB;
 	void clone(GameData& cloned) {};
 	GameData() = default;
-	~GameData();
 	void setAlgoA(IBattleshipGameAlgo* algo);
 	void setAlgoB(IBattleshipGameAlgo* algo);
 	IBattleshipGameAlgo* getAlgoA();
 	IBattleshipGameAlgo* getAlgoB();
 
+	void setUserFleetA(UserFleet& fleetA);
+	void setUserFleetB(UserFleet& fleetB);
 	bool loadAndValidateBoard(string boardPath);
-
+	void clone(GameData& cloned);
 private:
 	
 	void buildShip(int x, int y, int z, char shipChar, bool *** visitBoard, list<char>& failedCharA, list<char>& failedCharB);
@@ -58,7 +56,6 @@ private:
 	bool isSpacesAreOK(int depth, int length, int width, char c) const;
 
 	bool checkSpacesInPosition(int x, int y, int z, char c) const;
-
 	IBattleshipGameAlgo* playerAlgoA = nullptr;
 	IBattleshipGameAlgo* playerAlgoB = nullptr;
 

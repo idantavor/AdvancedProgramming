@@ -1,8 +1,9 @@
 #pragma once
-#ifndef BOARD_PARSER
-#define BOARD_PARSER
+#ifndef SHARED_BOARD
+#define SHARED_BOARD
 #include <string>
 #include <fstream>
+#include <memory>
 #include "dirent.h"
 #include "InflatableBoat.h"
 #include "battleship.h"
@@ -16,14 +17,16 @@
 
 using namespace std;
 
-class BoardParser {
+class SharedBoard {
 public:
-	
-	BoardParser(string boardPath);
-	string** loadBoard();
+
+	SharedBoard(string boardPath);
+	~SharedBoard();
+	bool loadBoard();
 	unsigned int getRowSize();
 	unsigned int getDepthSize();
 	unsigned int getColSize();
+	char getCharAt(int x, int y, int z);
 
 private:
 
@@ -48,7 +51,7 @@ private:
 	unsigned int depthSize = 0;
 
 	bool endOfFile = false;
-	string** board = nullptr;
+	string** board;
 	string boardPath;
 };
 #endif

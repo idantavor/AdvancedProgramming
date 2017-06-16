@@ -131,4 +131,12 @@ bool Ship::checkShape()
 	return true;
 }
 
+void Ship::copyPositionList(std::list<Position> newPositionList, std::list<Position> oldPositionList)
+{
+	for (std::list<Position>::iterator it = (oldPositionList).begin(); it != (oldPositionList).end(); ++it)
+	{
+		(newPositionList).push_back(Position(it->getX(), it->getY(), it->getX()));
+	}
+}
+
 

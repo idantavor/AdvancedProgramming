@@ -13,10 +13,17 @@ int main(int argc, char* argv[])
 		path = argv[1][0] != '-' ? argv[1] : "";//get path parameter
 	}
 
-	BattleManager bm = BattleManager();
-	if (!bm.validateFilesExistance(path)) {
+	BattleManager* bm = new BattleManager();
+	if (!bm->validateFilesExistance(path)) {
 		return -1;
 	}
+
+	GameData* g = new GameData();
+
+	(**(bm->gamesList.begin())).clone(*g);
+	delete bm;
+
+	cout << g->board->getRowSize() << endl;
 	return 0;
 }
 
