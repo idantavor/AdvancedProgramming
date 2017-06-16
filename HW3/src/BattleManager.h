@@ -1,11 +1,9 @@
 #pragma once
 #include "Ship.h"
 #include "UserFleet.h"
-#include "ConsolePrinter.h"
 #ifndef BATTLE_MANAGER
 #define BATTLE_MANAGER
 #include "IBattleshipGameAlgo.h"
-#include "BattleShipGameFromFile.h"
 #include <string>
 #include <vector>
 #include <direct.h>
@@ -36,7 +34,7 @@ class BattleManager {
 		int boardSize;
 		bool quiet;
 		static bool isKnownLetter(char c);
-		ConsolePrinter cp;
+
 
 	public:
 		~BattleManager() {
@@ -44,11 +42,10 @@ class BattleManager {
 			if (playerB != nullptr) delete playerB;
 			if (board != nullptr)delete[] board;
 		}
-		BattleManager(const int boardSize = 10,bool quiet=false,int delay=ATTACKS_DELAY) {
+		BattleManager(const int boardSize = 10,bool quiet=false,int delay=1) {
 			this->boardSize = boardSize;
 			board = new string[boardSize+1];
 			this->quiet = quiet;
-			this->cp.set_delay(delay);
 		}
 
 	void loadBoard(const string& boardPath) const;

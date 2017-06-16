@@ -8,14 +8,14 @@
 #include <functional>
 #include <memory>
 #include <vector>
-#include "dirent.h"
+
 #include "Ship.h"
 #include <string>
 #include "InflatableBoat.h"
 #include "battleship.h"
 #include "submarine.h"
 #include "missileBoat.h"
-#include "NaiveAlgo.h"
+
 #include "Utility.h"
 
 

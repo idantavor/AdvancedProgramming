@@ -2,6 +2,7 @@
 #include "BattleManager.h"
 #include "Utility.h"
 #include "dirent.h"
+#include <iostream>
 
 pair<bool, string> Utility::getCommandLineArg(const string arg_to_find, int argc, char * argv[])
 {
@@ -68,6 +69,8 @@ bool Utility::has_suffix(const std::string &str, const std::string &suffix)
 	return str.size() >= suffix.size() &&
 		str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
+
+
 
 
 

@@ -11,4 +11,8 @@ public:
 	static bool has_suffix(const std::string& str, const std::string& suffix);
 };
 
+bool operator==(const Coordinate& c1, const Coordinate& c2) {
+	return c1.col == c2.col && c1.row == c2.row && c1.depth == c2.depth;
+}
+
 
