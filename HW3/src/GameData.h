@@ -39,7 +39,7 @@ public:
 	string** board = nullptr;
 	UserFleet fleetA;
 	UserFleet fleetB;
-	void clone(GameData& cloned);
+	void clone(GameData& cloned) {};
 	GameData() = default;
 	~GameData();
 	void setAlgoA(IBattleshipGameAlgo* algo);

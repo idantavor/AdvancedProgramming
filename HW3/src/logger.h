@@ -5,19 +5,21 @@
 #include <mutex>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 class InnerLogger {
 
 private:
 	mutex logWriteMutex;
+	int width = 10;
 	ofstream logFile;
 	InnerLogger() {
 		logFile.open("game.log");
 	};
 	void writeMessage(string severity, string moduleName, string message) {
 		logWriteMutex.lock();
-		logFile << getDateTime() << " | " << moduleName << " | " << severity << " : " << message << endl;
+		logFile <<left<< setw(width) << setfill(' ')<< getDateTime() << " | "  <<  setw(width) << setfill(' ') <<moduleName << " | "  << setw(width) << setfill(' ') <<severity << " : " << message << endl;
 		logWriteMutex.unlock();
 	}
 
