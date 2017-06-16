@@ -3,7 +3,6 @@
 Ship::Ship(int len)
 {
 	currentLength = len;
-	isHorizontal = false;
 }
 
 bool Ship::isPositionInShip(const Position p)
@@ -44,9 +43,9 @@ bool Ship::attackShip(const Position& p)
 	return false;
 }
 
-bool Ship::addPointToTheList(int x, int y)
+bool Ship::addPointToTheList(int x, int y, int z)
 {
-	(positionList).push_back(Position(x, y));
+	(positionList).push_back(Position(x, y, z));
 	return false;
 }
 
@@ -59,8 +58,10 @@ bool Ship::checkShape()
 {
 	int countX = 0;
 	int countY = 0;
+	int countZ = 0;
 	int x =0;
 	int y =0 ;
+	int z = 0; 
 	bool first = true;
 	for (std::list<Position>::iterator it = (positionList).begin(); it != (positionList).end(); ++it)
 	{
@@ -68,8 +69,10 @@ bool Ship::checkShape()
 		{
 			countX++;
 			countY++;
+			countZ++;
 			x = (*it).getX();
 			y = (*it).getY();
+			z = (*it).getZ();
 			first = false;
 			continue;
 		}
@@ -83,9 +86,14 @@ bool Ship::checkShape()
 			countY++;
 			y = (*it).getY();
 		}
+		if ((*it).getZ() != z)
+		{
+			countZ++;
+			z = (*it).getZ();
+		}
 
 	}
-	if(countX> 1 && countY > 1){
+	if((countX> 1 && (countY > 1 || countZ> 1)) || (countZ > 1 && countY > 1 )){
 		return false;
 
 	}
@@ -96,7 +104,6 @@ bool Ship::checkShape()
 			return false;
 		}
 
-		isHorizontal = true;
 	}
 
 	else if (countY > 1)
@@ -105,7 +112,14 @@ bool Ship::checkShape()
 		{
 			return false;
 		}
-		isHorizontal = false;
+	}
+
+	else if (countZ > 1)
+	{
+		if (countZ != currentLength)
+		{
+			return false;
+		}
 	}
 
 	else {
@@ -115,6 +129,14 @@ bool Ship::checkShape()
 	}
 
 	return true;
+}
+
+void Ship::copyPositionList(std::list<Position> newPositionList, std::list<Position> oldPositionList)
+{
+	for (std::list<Position>::iterator it = (oldPositionList).begin(); it != (oldPositionList).end(); ++it)
+	{
+		(newPositionList).push_back(Position(it->getX(), it->getY(), it->getX()));
+	}
 }
 
 

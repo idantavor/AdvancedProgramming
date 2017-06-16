@@ -22,6 +22,9 @@ class InflatableBoat: public Ship
 		char getSymbolBPlayer() override {
 			return symbolBPlayer;
 		}
+
+		InflatableBoat* clone() override;
+
 		static char symbolAPlayer;
 		static char symbolBPlayer;
 		static int length;

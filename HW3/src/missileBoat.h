@@ -23,6 +23,8 @@ class missileBoat : public Ship
 			return symbolBPlayer;
 		}
 
+		missileBoat* clone() override;
+
 		static char symbolAPlayer;
 		static char symbolBPlayer;
 		static int length;
