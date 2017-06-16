@@ -79,7 +79,7 @@ private:
 	static Coordinate& fromRealIndexToRepresnt(const Coordinate& c);
 	static void countShips(const BoardData& bd, list<int>& listToFill);
 	static void addToList(int item, int times, list<int>& l);
-	/*template <T>*/
-	/*static void free3dArray(T*** arr, int d1, int d2 );*/
+	template <class T>
+	static void free3dArray(T*** arr, int d1, int d2 );
 };
 

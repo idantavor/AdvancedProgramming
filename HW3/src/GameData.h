@@ -46,7 +46,6 @@ public:
 	void setUserFleetA(UserFleet& fleetA);
 	void setUserFleetB(UserFleet& fleetB);
 	bool loadAndValidateBoard(string boardPath);
-	void clone(GameData& cloned);
 private:
 	
 	void buildShip(int x, int y, int z, char shipChar, bool *** visitBoard, list<char>& failedCharA, list<char>& failedCharB);

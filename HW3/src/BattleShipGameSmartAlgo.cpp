@@ -11,16 +11,20 @@ const Coordinate BattleShipGameSmartAlgo::deltaCords[3] = {Coordinate(1,0,0), Co
 
 //C'tor
 BattleShipGameSmartAlgo::BattleShipGameSmartAlgo() {
-	//here the attachFilePath should exist
-	m_mode = SEARCH_MODE;
+	//clear all data structs
 	m_shipsUnderAttack.clear();
+	m_myShips.clear();
+	m_statusBoard = nullptr;
+	m_probBoard = nullptr;
+	//set starting mode
+	m_mode = SEARCH_MODE;
 	srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 //D'tor
 BattleShipGameSmartAlgo::~BattleShipGameSmartAlgo() {
-	/*free3dArray(m_statusBoard, m_rowNum, m_colNum);
-	free3dArray(m_probBoard, m_rowNum, m_colNum);*/
+	free3dArray(m_statusBoard, m_rowNum, m_colNum);
+	free3dArray(m_probBoard, m_rowNum, m_colNum);
 }
 
 void BattleShipGameSmartAlgo::setPlayer(int player)
@@ -34,16 +38,18 @@ bool BattleShipGameSmartAlgo::init(const std::string& path) {
 }
 
 void BattleShipGameSmartAlgo::setBoard(const BoardData& board) {
-	//initialize and mark board
+	//init dimensions
 	m_rowNum = board.rows();
 	m_colNum = board.cols();
 	m_depthNum = board.depth();
 	//init status board
-	m_statusBoard = new char**[m_rowNum];
-	for (int i = 0; i < m_rowNum; i++) {
-		m_statusBoard[i] = new char*[m_colNum];
-		for (int j = 0; j < m_colNum; j++) {
-			m_statusBoard[i][j] = new char[m_depthNum];
+	if (m_statusBoard == nullptr) {
+		m_statusBoard = new char**[m_rowNum];
+		for (int i = 0; i < m_rowNum; i++) {
+			m_statusBoard[i] = new char*[m_colNum];
+			for (int j = 0; j < m_colNum; j++) {
+				m_statusBoard[i][j] = new char[m_depthNum];
+			}
 		}
 	}
 	for (int x = 0; x < m_rowNum; x++) {
@@ -59,16 +65,30 @@ void BattleShipGameSmartAlgo::setBoard(const BoardData& board) {
 			}
 		}
 	}
-	//alocate prob board 
-	m_probBoard = new int**[m_rowNum];
-	for (int i = 0; i < m_rowNum; i++) {
-		m_probBoard[i] = new int*[m_colNum];
-		for (int j = 0; j < m_colNum; j++) {
-			m_probBoard[i][j] = new int[m_depthNum];
+	//init prob board 
+	if (m_probBoard == nullptr) {
+		m_probBoard = new int**[m_rowNum];
+		for (int i = 0; i < m_rowNum; i++) {
+			m_probBoard[i] = new int*[m_colNum];
+			for (int j = 0; j < m_colNum; j++) {
+				m_probBoard[i][j] = new int[m_depthNum];
+			}
+		}
+	}
+	for (int x = 0; x < m_rowNum; x++) {
+		for (int y = 0; y < m_colNum; y++) {
+			for (int z = 0; z < m_depthNum; z++) {
+				m_probBoard[x][y][z] = 0;
+			}
 		}
 	}
 	//init my oponenets ships list
+	m_leftShipsOfOpponent.clear();
 	countShips(board,m_leftShipsOfOpponent);
+	//init ships under attack
+	m_shipsUnderAttack.clear();
+	//set mode to search
+	m_mode = SEARCH_MODE;
 }
 
 
@@ -468,19 +488,19 @@ void BattleShipGameSmartAlgo::addToList(int item, int times, list<int>& l) {
 	}
 }
 
-//template<T>
-//void BattleShipGameSmartAlgo::free3dArray(T*** arr, int d1, int d2)
-//{
-//	for (int i = 0; i < d1; i++) {
-//		for (int j = 0; j < d2; j++) {
-//			delete[] arr[i][j];
-//		}
-//		delete arr[i];
-//	}
-//	delete[] arr;
-//}
+template<class T>
+void BattleShipGameSmartAlgo::free3dArray(T*** arr, int d1, int d2)
+{
+	for (int i = 0; i < d1; i++) {
+		for (int j = 0; j < d2; j++) {
+			delete[] arr[i][j];
+		}
+		delete arr[i];
+	}
+	delete[] arr;
+}
 
-IBattleshipGameAlgo* GetAlgorithm() {
-	return new BattleShipGameSmartAlgo();
-};
+//IBattleshipGameAlgo* GetAlgorithm() {
+//	return new BattleShipGameSmartAlgo();
+//};
 
