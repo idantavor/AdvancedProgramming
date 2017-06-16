@@ -36,7 +36,7 @@ public:
 	std::shared_ptr<SharedBoard> board;
 	UserFleet fleetA;
 	UserFleet fleetB;
-	void clone(GameData& cloned);
+	void clone(GameData& cloned) {};
 	GameData() = default;
 	void setAlgoA(IBattleshipGameAlgo* algo);
 	void setAlgoB(IBattleshipGameAlgo* algo);

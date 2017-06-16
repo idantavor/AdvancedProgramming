@@ -11,35 +11,54 @@
 #include "Ship.h"
 #include <string>
 #include "Utility.h"
+#include <vector>
+#include "AlgoDLL.h"
+#include <unordered_map>
+#include <queue>
 
 
 
 
-IBattleshipGameAlgo* BattleManager::loadFromDLL(string path)
-{	
-	UINT oldMode = SetErrorMode(0);
-	SetErrorMode(oldMode | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
-		IBattleshipGameAlgo * instance;
-		HINSTANCE hDll;
-		try {
-		// Load dynamic library 
-		hDll = LoadLibraryA(path.c_str());
-		using FunctionPtr = IBattleshipGameAlgo* (*) ();
-		if (hDll)
-		{
-			// GetAlgorithm function
-			auto GetAlgorithm = reinterpret_cast<FunctionPtr>(GetProcAddress(hDll, "GetAlgorithm"));
-			instance = GetAlgorithm();
-		}
-		else {
-			throw exception("failed to load library");
+void BattleManager::buildBattlesQueue()
+{
+	std::unordered_map<int, vector<pair<int, int>>> combinationMap;
+	//build all player combinations
+	for (int i = 0; i<this->algorithms.size(); i ++ ) {
+		for (int j = 0; j < this->algorithms.size(); j++) {
+			if (i == j)continue;
+			if (combinationMap.find(i)!=combinationMap.end()) {
+				combinationMap.find(i)->second.push_back({ i,j });
+			}
+			else {
+				std::vector<pair<int,int>> v;
+				v.push_back({ i,j });
+				combinationMap.insert({ i,v });
+			}
 		}
 	}
-	catch (exception e) {
-		throw e;
+	//add to ThreadPool queue all of the battles in an even way
+	for (auto itr = this->gamesList.cbegin(); itr != gamesList.cend(); itr++) {
+		for (int i = 0; i < this->algorithms.size() - 1; i++) {// i will be each dll combination index
+			for (int j = 0; j < this->algorithms.size(); j++) {
+				pair<int, int> combination = combinationMap.find(j)->second.at(i);
+				this->threadPool.addGameToQueue(&this->algorithms.at(combination.first), &this->algorithms.at(combination.second), *itr);
+			}
+		}
+
 	}
 	
-	return instance;
+}
+
+BattleManager::BattleManager(string boardPaths,int numOfThreads)
+{
+	validateFilesExistance(boardPaths);
+	//added const copy cnt'r in order to support vector insertion
+	for (auto stringItr = this->dllFilePaths.begin(); stringItr != this->dllFilePaths.end(); stringItr++) {
+		this->algorithms.push_back(AlgoDLL(*stringItr, this->tRporter));
+	}
+	this->tRporter.setAlgNum(this->algorithms.size());
+	this->threadNum = numOfThreads;
+	this->buildBattlesQueue();
 }
 
 BattleManager::~BattleManager()
@@ -77,7 +96,7 @@ bool BattleManager::validateFilesExistance(const std::string& dirPath) {
 			boardsFilesPath.push_back(searchIn + '\\' + fileNames[i]);
 		}
 		if (Utility::has_suffix(fileNames[i], "dll")) {
-			dllFiels.push_back(searchIn + '\\' + fileNames[i]);
+			dllFilePaths.push_back(searchIn + '\\' + fileNames[i]);
 		}
 	}
 
