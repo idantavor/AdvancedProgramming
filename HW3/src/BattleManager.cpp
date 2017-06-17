@@ -23,8 +23,8 @@ void BattleManager::buildBattlesQueue()
 {
 	std::unordered_map<int, vector<pair<int, int>>> combinationMap;
 	//build all player combinations
-	for (int i = 0; i<this->algorithms.size(); i ++ ) {
-		for (int j = 0; j < this->algorithms.size(); j++) {
+	for (size_t  i = 0; i<this->algorithms.size(); i ++ ) {
+		for (size_t  j = 0; j < this->algorithms.size(); j++) {
 			if (i == j)continue;
 			if (combinationMap.find(i)!=combinationMap.end()) {
 				combinationMap.find(i)->second.push_back({ i,j });
@@ -38,8 +38,8 @@ void BattleManager::buildBattlesQueue()
 	}
 	//add to ThreadPool queue all of the battles in an even way
 	for (auto itr = this->gamesList.cbegin(); itr != gamesList.cend(); itr++) {
-		for (int i = 0; i < this->algorithms.size() - 1; i++) {// i will be each dll combination index
-			for (int j = 0; j < this->algorithms.size(); j++) {
+		for (size_t  i = 0; i < this->algorithms.size() - 1; i++) {// i will be each dll combination index
+			for (size_t  j = 0; j < this->algorithms.size(); j++) {
 				pair<int, int> combination = combinationMap.find(j)->second.at(i);
 				this->threadPool.addGameToQueue(&this->algorithms.at(combination.first), &this->algorithms.at(combination.second), *itr);
 			}
@@ -54,7 +54,8 @@ BattleManager::BattleManager(string boardPaths,int numOfThreads)
 	validateFilesExistance(boardPaths);
 	//added const copy cnt'r in order to support vector insertion
 	for (auto stringItr = this->dllFilePaths.begin(); stringItr != this->dllFilePaths.end(); stringItr++) {
-		this->algorithms.push_back(AlgoDLL(*stringItr, this->tRporter));
+		AlgoDLL alg(*stringItr, this->tRporter);
+		this->algorithms.push_back(alg);
 	}
 	this->tRporter.setAlgNum(this->algorithms.size());
 	this->threadNum = numOfThreads;
@@ -137,6 +138,11 @@ void BattleManager::loadBoardsInToGameManager(std::list<string> boardPaths)
 			delete game;
 		}
 	}
+}
+
+void BattleManager::startTournament()
+{
+	this->threadPool.launchThreads(this->threadNum);
 }
 
 

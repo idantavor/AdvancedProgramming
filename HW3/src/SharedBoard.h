@@ -23,20 +23,20 @@ public:
 	SharedBoard(string boardPath);
 	~SharedBoard();
 	bool loadBoard();
-	unsigned int getRowSize();
-	unsigned int getDepthSize();
-	unsigned int getColSize();
+	unsigned int  getRowSize();
+	unsigned int  getDepthSize();
+	unsigned int  getColSize();
 	char getCharAt(int x, int y, int z);
 
 private:
 
 	string getNextLine(streambuf * borderStream);
 
-	void addRowsToBoard(int depth, int countRowsInBord);
+	void addRowsToBoard(unsigned int depth, unsigned int countRowsInBord);
 
-	void addTableToBoard(int depth);
+	void addTableToBoard(unsigned int depth);
 
-	void addLineToBoard(string & line, int depth, int countRowsInBord);
+	void addLineToBoard(string & line, unsigned int depth, unsigned int countRowsInBord);
 
 	void initializeBoard();
 
@@ -46,9 +46,9 @@ private:
 
 	bool isKnownLetter(char c);
 
-	unsigned int rowsSize = 0;
-	unsigned int colsSize = 0;
-	unsigned int depthSize = 0;
+	unsigned int  rowsSize = 0;
+	unsigned int  colsSize = 0;
+	unsigned int  depthSize = 0;
 
 	bool endOfFile = false;
 	string** board;

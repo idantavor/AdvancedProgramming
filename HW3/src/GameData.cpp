@@ -111,7 +111,7 @@ bool GameData::loadAndValidateBoard(const string boardPath)
 	return checksPass;
 }
 
-void GameData::buildShip( int x, int y, int z, char shipChar, bool*** visitBoard, list<char>& failedCharA, list<char>& failedCharB)
+void GameData::buildShip(unsigned int x, unsigned int y, unsigned int z, char shipChar, bool*** visitBoard, list<char>& failedCharA, list<char>& failedCharB)
 {
 
 	if (shipChar == InflatableBoat::symbolAPlayer)
@@ -259,20 +259,20 @@ void GameData::buildShip( int x, int y, int z, char shipChar, bool*** visitBoard
 }
 
 
-void GameData::shipCollectChars(int x, int y, int z, char shipChar, bool*** visitBoard, Ship& ship) const {
+void GameData::shipCollectChars(unsigned int x, unsigned int y, unsigned int z, char shipChar, bool*** visitBoard, Ship& ship) const {
 	visitBoard[z][x][y] = true;
 	ship.addPointToTheList(x, y, z);
-	int x_i = x + 1;
+	unsigned int x_i = x + 1;
 	if (x_i >= 0 && x_i < board->getRowSize() && !visitBoard[z][x_i][y] && board->getCharAt(x_i, y, z) == shipChar)
 	{
 		shipCollectChars(x_i, y, z, shipChar, visitBoard, ship);
 	}
-	int y_i = y + 1;
+	unsigned int y_i = y + 1;
 	if (y_i >= 0 && y_i < board->getColSize() && !visitBoard[z][x][y_i] && board->getCharAt(x, y_i, z) == shipChar)
 	{
 		shipCollectChars(x, y_i, z, shipChar, visitBoard, ship);
 	}
-	int z_i = z + 1;
+	unsigned int z_i = z + 1;
 	if (z_i >= 0 && z_i < board->getDepthSize() && !visitBoard[z_i][x][y] && board->getCharAt(x, y, z_i) == shipChar)
 	{
 		shipCollectChars(x, y, z_i, shipChar, visitBoard, ship);
@@ -294,7 +294,7 @@ void GameData::shipCollectChars(int x, int y, int z, char shipChar, bool*** visi
 	}
 }
 
-bool GameData::isSpacesAreOK(int x, int y, int z, char c) const
+bool GameData::isSpacesAreOK(unsigned int x, unsigned int y, unsigned int z, char c) const
 {
 	if (!checkSpacesInPosition(x + 1, y, z, c)) { return false; }
 	if (!checkSpacesInPosition(x - 1, y, z, c)) { return false; }
@@ -308,7 +308,7 @@ bool GameData::isSpacesAreOK(int x, int y, int z, char c) const
 	return true;
 }
 
-bool GameData::checkSpacesInPosition(int x, int y, int z, char c) const
+bool GameData::checkSpacesInPosition(size_t  x, size_t y, size_t z, char c) const
 {
 	if (x > 0 && y > 0 && z > 0 && x < board->getRowSize() && y < board->getColSize() && z <  board->getDepthSize() && board->getCharAt(x, y, z) != c && board->getCharAt(x, y, z) != ' ') {
 		return false;

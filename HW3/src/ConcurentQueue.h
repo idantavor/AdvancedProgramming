@@ -47,7 +47,7 @@ public:
 			return data;
 		}
 		else {
-			return NULL;
+			throw exception("Empty Queue");
 		}
 		
 		
