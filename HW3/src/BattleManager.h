@@ -10,6 +10,7 @@
 #include "GameData.h"
 #include "TournamentReporter.h"
 #include "BattleThreadPool.h"
+#include "logger.h"
 
 
 

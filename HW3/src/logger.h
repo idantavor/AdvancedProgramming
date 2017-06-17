@@ -13,10 +13,9 @@ class InnerLogger {
 private:
 	mutex logWriteMutex;
 	int width = 10;
+	string path;
 	ofstream logFile;
-	InnerLogger() {
-		logFile.open("game.log");
-	};
+	InnerLogger() = default;
 	void writeMessage(string severity, string moduleName, string message) {
 		logWriteMutex.lock();
 		logFile <<left<< setw(width) << setfill(' ')<< getDateTime() << " | "  <<  setw(width) << setfill(' ') <<moduleName << " | "  << setw(width) << setfill(' ') <<severity << " : " << message << endl;
@@ -25,7 +24,6 @@ private:
 
 public:
 	InnerLogger(InnerLogger const&) = delete;
-
 	void operator=(InnerLogger const&) = delete;
 
 	static InnerLogger& getInstnace() {
@@ -39,6 +37,14 @@ public:
 		localtime_s(&tstruct, &now);
 		strftime(buf, sizeof(buf), "%d-%m-%Y | %X", &tstruct);
 		return buf;
+	}
+
+	void setPath(string path) {
+		string logPath = "game.log";
+		if (!path.empty()) {
+			logPath = path + '\\' + logPath;
+		}
+		logFile.open(logPath);
 	}
 
 	void Info(string moduleName, string message) {
@@ -75,6 +81,10 @@ public:
 	}
 	void Warning( string message) {
 		InnerLogger::getInstnace().Warning(this->moduleName, message);
+	}
+
+	void setLogPath(string path) {
+		InnerLogger::getInstnace().setPath(path);
 	}
 
 };

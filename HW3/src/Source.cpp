@@ -8,6 +8,7 @@
 #include "Utility.h"
 using namespace std;
 
+
 void main(int argc,char*argv[]) {
 	
 	auto result = Utility::getCommandLineArg("threads", argc, argv);
@@ -23,4 +24,5 @@ void main(int argc,char*argv[]) {
 	BattleManager bm(".",threads);
 	bm.runTournament();
 };
+
 

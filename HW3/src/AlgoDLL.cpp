@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-void AlgoDLL::loadGetAlgFuncFromDLL(string path)
+bool AlgoDLL::loadGetAlgFuncFromDLL(string path)
 {
 		UINT oldMode = SetErrorMode(0);
 		SetErrorMode(oldMode | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
@@ -20,12 +20,16 @@ void AlgoDLL::loadGetAlgFuncFromDLL(string path)
 				this->getAlgoFunc = reinterpret_cast<FunctionPtr>(GetProcAddress(hDll, "GetAlgorithm"));
 			}
 			else {
-				throw exception("failed to load library");
+				Logger("AlgoDLL").Warning("Failed to load library: " + path);
+				return false;
 			}
 		}
 		catch (exception e) {
-			throw e;
+			Logger("AlgoDLL").Warning("Failed to load library: " + path);
+			return false;
 		}
+
+		return true;
 
 		
 }
