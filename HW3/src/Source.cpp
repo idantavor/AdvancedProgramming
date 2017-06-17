@@ -11,7 +11,7 @@ using namespace std;
 void main(int argc,char*argv[]) {
 	
 	auto result = Utility::getCommandLineArg("threads", argc, argv);
-	int threads = 1;
+	int threads = 4;
 	if (result.first) {
 		try {
 			threads = (int(stoi(result.second)));
