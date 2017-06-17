@@ -28,9 +28,6 @@ using namespace std;
 
 #define CORD_NO_MATCH Coordinate(-1,-1,-1)
 
-enum class AttackDirection {
-	UP, DOWN, RIGHT,LEFT
-};
 
 class BattleShipGameSmartAlgo : public IBattleshipGameAlgo {
 public:
@@ -58,12 +55,11 @@ private:
 	list<set<Coordinate>> m_shipsUnderAttack;
 	list<int> m_leftShipsOfOpponent;
 	set<Coordinate> m_myShips;
-	AttackDirection m_direction;
 
-	Coordinate& getNextDestroyPosition();
+	Coordinate getNextDestroyPosition();
 	void addAttackedPointToShipsList(Coordinate& attackedPoint);//addes the attacked point to the list of ships, either to an existing ship, or creates a new one
 	void removeSunkShipFromShipsListAndMarkPlacesAsSunk(Coordinate& attackedPoint);
-	Coordinate& getSearchPoint();
+	Coordinate getSearchPoint();
 	bool checkSurrondingPoint(Coordinate& c);//makes sure that a point is eithr out of range, or does not contain a ship, or is part of the attacked ship 
 	bool isInBoard(Coordinate& c);
 	std::pair<int, int> getMinMax(set<Coordinate>& setOfPoints, char rowOrColOrDepth); //retruns the <min,max> row/col/depth in the set. 'r' for row, 'c' for col 'd' for depth
@@ -75,8 +71,8 @@ private:
 	//static functions
 	static bool areAdjacent(const Coordinate& p1, const Coordinate& p2);//returns true if the points are next to each other, false o.w
 	static bool areShipsAdjacent(const set<Coordinate>& s1, const set<Coordinate>& s2);
-	static Coordinate& fromRepresntToRealIndex(const Coordinate& c);
-	static Coordinate& fromRealIndexToRepresnt(const Coordinate& c);
+	static Coordinate fromRepresntToRealIndex(const Coordinate& c);
+	static Coordinate fromRealIndexToRepresnt(const Coordinate& c);
 	static void countShips(const BoardData& bd, list<int>& listToFill);
 	static void addToList(int item, int times, list<int>& l);
 	template <class T>
