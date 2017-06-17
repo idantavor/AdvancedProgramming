@@ -33,7 +33,7 @@ public:
 
 	std::list<GameData*> gamesList;
 	std::list<string> dllFilePaths;
-	void startTournament();
+	void runTournament();
 
 };
 #endif

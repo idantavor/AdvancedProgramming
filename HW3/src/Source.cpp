@@ -22,7 +22,7 @@ void main(int argc,char*argv[]) {
 		}
 	};
 	BattleManager bm(".",threads);
-	bm.startTournament();
+	bm.runTournament();
 };
 
 

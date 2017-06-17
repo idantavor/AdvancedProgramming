@@ -1,5 +1,5 @@
 #include "UserFleet.h"
-
+#include <iostream>
 UserFleet::~UserFleet()
 {
 	for (auto &it : shipsList) delete it; 
