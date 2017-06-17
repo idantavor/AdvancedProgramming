@@ -14,6 +14,7 @@ BattleShipGameSmartAlgo::BattleShipGameSmartAlgo() {
 	//clear all data structs
 	m_shipsUnderAttack.clear();
 	m_myShips.clear();
+	m_leftShipsOfOpponent.clear();
 	m_statusBoard = nullptr;
 	m_probBoard = nullptr;
 	//set starting mode
@@ -42,6 +43,15 @@ void BattleShipGameSmartAlgo::setBoard(const BoardData& board) {
 	m_rowNum = board.rows();
 	m_colNum = board.cols();
 	m_depthNum = board.depth();
+	//clear data strcuts
+	m_shipsUnderAttack.clear();
+	m_myShips.clear();
+	m_leftShipsOfOpponent.clear();
+	//init opponenets ships
+	countShips(board, m_leftShipsOfOpponent);
+	//set mode to search
+	m_mode = SEARCH_MODE;
+
 	//init status board
 	if (m_statusBoard == nullptr) {
 		m_statusBoard = new char**[m_rowNum];
@@ -65,7 +75,7 @@ void BattleShipGameSmartAlgo::setBoard(const BoardData& board) {
 			}
 		}
 	}
-	//init prob board 
+	//allocate prob board 
 	if (m_probBoard == nullptr) {
 		m_probBoard = new int**[m_rowNum];
 		for (int i = 0; i < m_rowNum; i++) {
@@ -75,20 +85,6 @@ void BattleShipGameSmartAlgo::setBoard(const BoardData& board) {
 			}
 		}
 	}
-	for (int x = 0; x < m_rowNum; x++) {
-		for (int y = 0; y < m_colNum; y++) {
-			for (int z = 0; z < m_depthNum; z++) {
-				m_probBoard[x][y][z] = 0;
-			}
-		}
-	}
-	//init my oponenets ships list
-	m_leftShipsOfOpponent.clear();
-	countShips(board,m_leftShipsOfOpponent);
-	//init ships under attack
-	m_shipsUnderAttack.clear();
-	//set mode to search
-	m_mode = SEARCH_MODE;
 }
 
 
@@ -160,8 +156,7 @@ void BattleShipGameSmartAlgo::removeSunkShipFromShipsListAndMarkPlacesAsSunk(Coo
 
 
 
-Coordinate& BattleShipGameSmartAlgo::getNextDestroyPosition() {
-	std::pair<int, int> result;
+Coordinate BattleShipGameSmartAlgo::getNextDestroyPosition() {
 	set<Coordinate>* shipUnderAttack = getShipUnderAttack();
 	if (shipUnderAttack == nullptr) {//sanity shouldn't happen
 		return CORD_NO_MATCH;
@@ -262,7 +257,8 @@ bool BattleShipGameSmartAlgo::validatePoint(Coordinate& c) {
 		);
 }
 
-void BattleShipGameSmartAlgo::tryToPlaceShip(int shipSize) {
+void BattleShipGameSmartAlgo::tryToPlaceShip(int shipSize)
+{
 	//go over all starting points
 	for (int r = 0; r < m_rowNum; r++) {
 		for (int c = 0; c < m_colNum; c++) {
@@ -295,7 +291,8 @@ void BattleShipGameSmartAlgo::tryToPlaceShip(int shipSize) {
 	}
 }
 
-Coordinate& BattleShipGameSmartAlgo::getSearchPoint() {
+Coordinate BattleShipGameSmartAlgo::getSearchPoint()
+{
 	//first zero the prob matrix
 	zeroProbBoard();
 	//refill it according to current status
@@ -305,9 +302,9 @@ Coordinate& BattleShipGameSmartAlgo::getSearchPoint() {
 	//find most propable Coorednate
 	int maxCnt = 0;
 	Coordinate maxCord = CORD_NO_MATCH;
-	for (int x; x < m_rowNum; x++) {
-		for (int y; y < m_colNum; y++) {
-			for (int z; z < m_depthNum; z++) {
+	for (int x =0 ; x < m_rowNum; x++) {
+		for (int y = 0; y < m_colNum; y++) {
+			for (int z = 0; z < m_depthNum; z++) {
 				if (m_probBoard[x][y][z] > maxCnt) {
 					maxCnt = m_probBoard[x][y][z];
 					maxCord = Coordinate(x, y, z);
@@ -319,7 +316,8 @@ Coordinate& BattleShipGameSmartAlgo::getSearchPoint() {
 }
 
 
-void BattleShipGameSmartAlgo::notifyOnAttackResult(int player, Coordinate move, AttackResult result){
+void BattleShipGameSmartAlgo::notifyOnAttackResult(int player, Coordinate move, AttackResult result)
+{
 	Coordinate realPoint = fromRepresntToRealIndex(move);
 	if (realPoint == CORD_NO_MATCH) {
 		return; // invalid attack position, nothing to do with it
@@ -361,8 +359,9 @@ bool BattleShipGameSmartAlgo::isInBoard(Coordinate& c)
 
 std::pair<int, int> BattleShipGameSmartAlgo::getMinMax(set<Coordinate>& setOfPoints, char rowOrColOrDepth)
 {
-	int min = std::max(m_colNum, m_rowNum, m_depthNum);
-	int max = 0;
+	int minVal = std::max(m_colNum, m_rowNum);
+	minVal = std::max(minVal, m_depthNum);
+	int maxVal = 0;
 	for (auto iter = setOfPoints.begin(); iter != setOfPoints.end(); iter++) {
 		int value = -1;
 		if (rowOrColOrDepth == 'r') {
@@ -374,17 +373,17 @@ std::pair<int, int> BattleShipGameSmartAlgo::getMinMax(set<Coordinate>& setOfPoi
 		else { //rowOrColOrDepth = d
 			value = (*iter).depth;
 		}
-		if (value > max) {
-			max = value;
+		if (value > maxVal) {
+			maxVal = value;
 		}
-		if (value < min) {
-			min = value;
+		if (value < minVal) {
+			minVal = value;
 		}
 	}
-	return std::pair<int, int>(min, max);
+	return std::pair<int, int>(minVal, maxVal);
 }
 
-Coordinate& BattleShipGameSmartAlgo::fromRepresntToRealIndex(const Coordinate& c)
+Coordinate BattleShipGameSmartAlgo::fromRepresntToRealIndex(const Coordinate& c)
 {
 	if (c == CORD_NO_MATCH) {
 		return CORD_NO_MATCH;
@@ -394,7 +393,7 @@ Coordinate& BattleShipGameSmartAlgo::fromRepresntToRealIndex(const Coordinate& c
 	}
 }
 
-Coordinate& BattleShipGameSmartAlgo::fromRealIndexToRepresnt(const Coordinate& c)
+Coordinate BattleShipGameSmartAlgo::fromRealIndexToRepresnt(const Coordinate& c)
 {
 	if (c == CORD_NO_MATCH) {
 		return CORD_NO_MATCH;
@@ -438,16 +437,16 @@ bool BattleShipGameSmartAlgo::areShipsAdjacent(const set<Coordinate>& s1, const 
 
 void BattleShipGameSmartAlgo::zeroProbBoard() 
 {
-	for (int x; x < m_rowNum; x++) {
-		for (int y; y < m_colNum; y++) {
-			for (int z; z < m_depthNum; z++) {
+	for (int x = 0 ; x < m_rowNum; x++) {
+		for (int y = 0; y < m_colNum; y++) {
+			for (int z = 0; z < m_depthNum; z++) {
 				m_probBoard[x][y][z] = 0;
 			}
 		}
 	}
 }
 void BattleShipGameSmartAlgo::countShips(const BoardData& bd, list<int>& listToFill) {
-	int cntInflt, cntMisl, cntSub, cntBtl = 0;
+	int cntInflt = 0, cntMisl = 0, cntSub = 0, cntBtl = 0;
 	for (int x = 0; x < bd.rows() ; x++) {
 		for (int y = 0; y <  bd.cols(); y++) {
 			for (int z = 0; z < bd.depth(); z++) {
@@ -500,7 +499,7 @@ void BattleShipGameSmartAlgo::free3dArray(T*** arr, int d1, int d2)
 	delete[] arr;
 }
 
-//IBattleshipGameAlgo* GetAlgorithm() {
-//	return new BattleShipGameSmartAlgo();
-//};
+IBattleshipGameAlgo* GetAlgorithm() {
+	return new BattleShipGameSmartAlgo();
+};
 

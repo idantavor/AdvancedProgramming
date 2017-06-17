@@ -145,6 +145,11 @@ void BattleManager::loadBoardsInToGameManager(std::list<string> boardPaths)
 	}
 }
 
+void BattleManager::startTournament()
+{
+	this->threadPool.launchThreads(this->threadNum);
+}
+
 
 
 

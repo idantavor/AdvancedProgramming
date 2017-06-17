@@ -15,7 +15,7 @@ public:
 	virtual char getSymbolAPlayer() = 0;
 	virtual char getSymbolBPlayer() = 0;
 	virtual bool checkShape();
-	void copyPositionList(std::list<Position> newPositionList, std::list<Position> oldPositionList);
+	void Ship::copyPositionList(std::list<Position> &newPositionList, std::list<Position> &oldPositionList);
 	std::list<Position> positionList;
 	virtual Ship* clone() = 0;
 

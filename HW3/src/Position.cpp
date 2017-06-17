@@ -60,3 +60,13 @@ void Position::setPosition(int x, int y)
 	setX(x);
 	setY(y);
 }
+
+Position::Position(Position & p)
+:x_coord(p.x_coord),y_coord(p.y_coord),z_coord(p.z_coord){
+	
+}
+Position::Position(const Position& p)
+: x_coord(p.x_coord), y_coord(p.y_coord), z_coord(p.z_coord){
+
+}
+
