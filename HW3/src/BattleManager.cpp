@@ -54,7 +54,8 @@ BattleManager::BattleManager(string boardPaths,int numOfThreads)
 	validateFilesExistance(boardPaths);
 	//added const copy cnt'r in order to support vector insertion
 	for (auto stringItr = this->dllFilePaths.begin(); stringItr != this->dllFilePaths.end(); stringItr++) {
-		this->algorithms.push_back(AlgoDLL(*stringItr, this->tRporter));
+		AlgoDLL alg(*stringItr, this->tRporter);
+		this->algorithms.push_back(alg);
 	}
 	this->tRporter.setAlgNum(this->algorithms.size());
 	this->threadNum = numOfThreads;
@@ -137,6 +138,11 @@ void BattleManager::loadBoardsInToGameManager(std::list<string> boardPaths)
 			delete game;
 		}
 	}
+}
+
+void BattleManager::startTournament()
+{
+	this->threadPool.launchThreads(this->threadNum);
 }
 
 

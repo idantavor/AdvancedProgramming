@@ -17,8 +17,7 @@ void AlgoDLL::loadGetAlgFuncFromDLL(string path)
 			if (hDll)
 			{
 				// GetAlgorithm function
-				auto GetAlgorithm = reinterpret_cast<FunctionPtr>(GetProcAddress(hDll, "GetAlgorithm"));
-				this->getAlgoFunc = getAlgoFunc;
+				this->getAlgoFunc = reinterpret_cast<FunctionPtr>(GetProcAddress(hDll, "GetAlgorithm"));
 			}
 			else {
 				throw exception("failed to load library");

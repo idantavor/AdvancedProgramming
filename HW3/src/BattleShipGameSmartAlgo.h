@@ -36,7 +36,7 @@ class BattleShipGameSmartAlgo : public IBattleshipGameAlgo {
 public:
 	BattleShipGameSmartAlgo();
 	~BattleShipGameSmartAlgo();
-
+	BattleShipGameSmartAlgo(BattleShipGameSmartAlgo& b) = delete;
 	void setPlayer(int player);
 	//here i assume receiving only my player's boats....
 	void setBoard(const BoardData& board);		// called once to notify player on his board, 

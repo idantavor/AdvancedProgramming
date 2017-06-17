@@ -92,5 +92,19 @@ bool BattleThreadPool::runBattle(AlgoDLL *dllA, AlgoDLL *dllB, GameData *bd)
 
 	return true;
 	
-};
+}
+void BattleThreadPool::HandleBattleQueue()
+{
+	tuple<AlgoDLL*, AlgoDLL*, GameData*> gameToRun;
+	while (!this->stopThreads) {
+		try {
+			gameToRun = this->gamesQueue.get();
+		}
+		catch (exception e) {
+			break;
+		}
+		this->runBattle(std::get<0>(gameToRun), std::get<1>(gameToRun), std::get<2>(gameToRun));
+	};
+}
+;
 

@@ -27,7 +27,9 @@ public:
 	}
 	
 	AlgoDLL(const AlgoDLL &a):tReporter(a.tReporter) {
-		
+		this->getAlgoFunc = a.getAlgoFunc;
+		this->algName = a.algName;
+
 	};
 	AlgoDLL& operator =(const AlgoDLL&) = delete;
 	auto GetAlgoInstance() {

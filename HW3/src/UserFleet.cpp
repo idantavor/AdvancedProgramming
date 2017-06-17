@@ -48,9 +48,10 @@ void UserFleet::addShipToList(Ship* ship)
 
 void UserFleet::clone(UserFleet& fleet)
 {
-	for (std::list<Ship*>::iterator it = shipsList.begin(); it != shipsList.end(); ++it)
+	for (std::list<Ship*>::iterator it = shipsList.begin(); it != shipsList.end();++it)
 	{
-		fleet.addShipToList((*it)->clone());
+		auto shipToAdd = (*it)->clone();
+		fleet.addShipToList(shipToAdd);
 	}
 }
 

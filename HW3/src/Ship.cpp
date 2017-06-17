@@ -1,4 +1,6 @@
 #include "ship.h"
+#include <ostream>
+#include <iostream>
 
 Ship::Ship(int len)
 {
@@ -131,12 +133,21 @@ bool Ship::checkShape()
 	return true;
 }
 
-void Ship::copyPositionList(std::list<Position> newPositionList, std::list<Position> oldPositionList)
-{
-	for (std::list<Position>::iterator it = (oldPositionList).begin(); it != (oldPositionList).end(); ++it)
-	{
-		(newPositionList).push_back(Position(it->getX(), it->getY(), it->getX()));
+std::ostream& operator<<(std::ostream& o, std::list<Position> & lp) {
+	for (auto it = lp.begin(); it != lp.end(); ++it) {
+		o << '(' << it->getX() << ',' << it->getY() << ',' << it->getZ() << ')' << std::endl;
 	}
+	return o;
+}
+
+void Ship::copyPositionList(std::list<Position> &newPositionList, std::list<Position> &oldPositionList)
+{
+	std::cout << oldPositionList;
+	newPositionList = std::list<Position>(oldPositionList.begin(),oldPositionList.end());
+	//for (auto it = oldPositionList.cbegin(); it != oldPositionList.cend(); ++it)
+	//{
+	//	newPositionList.push_back(*it);
+	//}
 }
 
 

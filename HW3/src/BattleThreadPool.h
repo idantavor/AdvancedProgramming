@@ -34,10 +34,7 @@ public:
 		}
 	}
 	
-	void HandleBattleQueue() {
-		while (!this->stopThreads) {
-		};
-	}
+	void HandleBattleQueue();
 
 	void addGameToQueue(AlgoDLL* p1, AlgoDLL* p2, GameData* gameData) {
 		this->gamesQueue.push(make_tuple(p1, p2, gameData));
