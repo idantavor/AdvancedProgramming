@@ -48,13 +48,13 @@ public:
 	bool loadAndValidateBoard(string boardPath);
 private:
 	
-	void buildShip(int x, int y, int z, char shipChar, bool *** visitBoard, list<char>& failedCharA, list<char>& failedCharB);
+	void buildShip(unsigned int x, unsigned int y, unsigned int z, char shipChar, bool *** visitBoard, list<char>& failedCharA, list<char>& failedCharB);
 
-	void shipCollectChars(int x, int y, int z, char shipChar, bool *** visitBoard, Ship & ship) const;
+	void shipCollectChars(unsigned int x, unsigned int y, unsigned int z, char shipChar, bool *** visitBoard, Ship & ship) const;
 
-	bool isSpacesAreOK(int depth, int length, int width, char c) const;
+	bool isSpacesAreOK(unsigned int depth, unsigned int length, unsigned int width, char c) const;
 
-	bool checkSpacesInPosition(int x, int y, int z, char c) const;
+	bool checkSpacesInPosition(size_t x, size_t y, size_t z, char c) const;
 	IBattleshipGameAlgo* playerAlgoA = nullptr;
 	IBattleshipGameAlgo* playerAlgoB = nullptr;
 
