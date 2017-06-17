@@ -17,7 +17,7 @@ bool BattleThreadPool::runBattle(AlgoDLL *dllA, AlgoDLL *dllB, GameData *bd)
 	UserGameData playerAData(0,gameData.board);
 	UserGameData playerBData(1, gameData.board);
 	playerA->setPlayer(0);//change to MACRO
-	playerB->setBoard(playerAData);
+	playerA->setBoard(playerAData);
 	playerB->setPlayer(1);
 	playerB->setBoard(playerBData);
 

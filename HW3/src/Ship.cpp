@@ -133,21 +133,24 @@ bool Ship::checkShape()
 	return true;
 }
 
-std::ostream& operator<<(std::ostream& o, std::list<Position> & lp) {
-	for (auto it = lp.begin(); it != lp.end(); ++it) {
-		o << '(' << it->getX() << ',' << it->getY() << ',' << it->getZ() << ')' << std::endl;
+std::ostream& operator<<(std::ostream& o, const std::list<Position> & lp) {
+	auto it = lp.cbegin();
+	while (it != lp.cend()) {
+		o << '(' << (*it).getX() << ',' << (*it).getY() << ',' << (*it).getZ() << ')' << std::endl;
+		it++;
 	}
+	
 	return o;
 }
 
 void Ship::copyPositionList(std::list<Position> &newPositionList, std::list<Position> &oldPositionList)
 {
-	std::cout << oldPositionList;
-	newPositionList = std::list<Position>(oldPositionList.begin(),oldPositionList.end());
-	//for (auto it = oldPositionList.cbegin(); it != oldPositionList.cend(); ++it)
-	//{
-	//	newPositionList.push_back(*it);
-	//}
+	//std::cout << oldPositionList;
+	//newPositionList = std::list<Position>(oldPositionList.begin(),oldPositionList.end());
+	for (auto it = oldPositionList.cbegin(); it != oldPositionList.cend(); ++it)
+	{
+		newPositionList.push_back(*it);
+	}
 }
 
 

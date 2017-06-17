@@ -45,7 +45,7 @@ private:
 		printElement(percentage, numWidth);
 		printElement(stat.pointsFor, pointWidth);
 		printElement(stat.pointsAgainst, pointWidth);
-		cout << endl;
+		cout << endl<<endl;
 	}
 public:
 	TournamentReporter(size_t _algNum) :algNum(_algNum) {};
@@ -62,6 +62,11 @@ public:
 	void startMonitor() {
 		this->monitorThread = unique_ptr<thread>{ new thread(&TournamentReporter::handleQueue, this) };
 	}
+
+	void terminateMonitor() {
+		this->stopMonitor = true;
+		this->monitorThread->join();
+	}
 	void test() {
 		printHeader();
 		AlgoStat alg("idan the king");
@@ -71,6 +76,7 @@ public:
 		alg.pointsFor = 2;
 		alg.pointsAgainst = 3;
 		printStat(alg,100);
+	
 	}
 
 	

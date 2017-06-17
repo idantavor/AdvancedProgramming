@@ -42,7 +42,6 @@ public:
 	void setAlgoB(IBattleshipGameAlgo* algo);
 	IBattleshipGameAlgo* getAlgoA();
 	IBattleshipGameAlgo* getAlgoB();
-
 	void setUserFleetA(UserFleet& fleetA);
 	void setUserFleetB(UserFleet& fleetB);
 	bool loadAndValidateBoard(string boardPath);
