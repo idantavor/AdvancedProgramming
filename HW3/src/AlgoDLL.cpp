@@ -13,6 +13,7 @@ void AlgoDLL::loadGetAlgFuncFromDLL(string path)
 		try {
 			// Load dynamic library 
 			hDll = LoadLibraryA(path.c_str());
+			int e = GetLastError();
 			using FunctionPtr = IBattleshipGameAlgo* (*) ();
 			if (hDll)
 			{
