@@ -209,8 +209,7 @@ bool SharedBoard::handleSizesLine(streambuf* borderStream) {
 		sizes.push_back(size);
 	}
 	if (sizes.size() != 3) {
-		// TODO:  log comment
-		cout << "size" << endl;
+		Logger("SharedBoard").Warning("Sizes row is incurrect");
 		return false;
 	}
 
@@ -220,17 +219,13 @@ bool SharedBoard::handleSizesLine(streambuf* borderStream) {
 		depthSize = stoi(sizes[2], nullptr, 0);
 	}
 	catch (const invalid_argument& ia) {
-		// TODO:  log comment not int fornat
+		Logger("SharedBoard").Warning("Sizes row is incurrect");
 		return false;
 	}
 	catch (const out_of_range& ia) {
-		// TODO:  log comment out of range
+		Logger("SharedBoard").Warning("Sizes row is incurrect");
 		return false;
 	}
-
-	cout << depthSize << endl;
-	cout << rowsSize << endl;
-	cout << colsSize << endl;
 
 	return true;
 }
@@ -249,7 +244,6 @@ SharedBoard::SharedBoard(string boardPath)
 
 SharedBoard::~SharedBoard()
 {
-	cout << "dis" << endl;
 	if (board != nullptr) {
 		for (unsigned int  i = 0; i < depthSize; i++) {
 			delete[] board[i];

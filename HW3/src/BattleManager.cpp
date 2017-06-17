@@ -54,8 +54,10 @@ BattleManager::BattleManager(string boardPaths,int numOfThreads)
 	validateFilesExistance(boardPaths);
 	//added const copy cnt'r in order to support vector insertion
 	for (auto stringItr = this->dllFilePaths.begin(); stringItr != this->dllFilePaths.end(); stringItr++) {
-		AlgoDLL alg(*stringItr, this->tRporter);
-		this->algorithms.push_back(alg);
+		AlgoDLL algo(*stringItr, this->tRporter);
+		if (algo.loadGetAlgFuncFromDLL(*stringItr)) {
+			this->algorithms.push_back(algo);
+		}
 	}
 	this->tRporter.setAlgNum(this->algorithms.size());
 	this->threadNum = numOfThreads;
@@ -87,6 +89,9 @@ bool BattleManager::validateFilesExistance(const std::string& dirPath) {
 		cout << "Wrong path : " << searchIn << endl;
 		return false;
 	}
+
+	Logger("BattleManager").setLogPath(searchIn);
+	Logger("BattleManager").Info("Start running progrem");
 	
 	//get file names in dir path
 	vector<string> fileNames;
@@ -104,16 +109,16 @@ bool BattleManager::validateFilesExistance(const std::string& dirPath) {
 	if(boardsFilesPath.size() == 0)
 	{
 		cout << errors[0] << searchIn << endl;
+		Logger("BattleManager").Error(errors[0] + searchIn);
 		isFilesFound = false;
 	}
 
-	/*
-	if(dllFiels.size() <2 ){
+	if(dllFilePaths.size() <2 ){
 		cout << errors[1] << searchIn << endl;
+		Logger("BattleManager").Error(errors[1] + searchIn);
 		isFilesFound = false;
 	}
 
-	*/
 	if (!isFilesFound) {
 		return false;
 	}
@@ -140,9 +145,12 @@ void BattleManager::loadBoardsInToGameManager(std::list<string> boardPaths)
 	}
 }
 
-void BattleManager::startTournament()
+void BattleManager::runTournament()
 {
+	this->tRporter.startMonitor();
 	this->threadPool.launchThreads(this->threadNum);
+	this->threadPool.wait();
+	this->tRporter.terminateMonitor();
 }
 
 

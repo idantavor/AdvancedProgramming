@@ -2,7 +2,7 @@
 
 void TournamentReporter::handleQueue()
 {
-	while (!this->stopMonitor) {
+	while (!this->stopMonitor || !this->statQueue.empty()) {
 		if (this->statQueue.empty()) {
 			this_thread::sleep_for(1s);
 			continue;

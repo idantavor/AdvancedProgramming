@@ -8,10 +8,11 @@
 #include "Utility.h"
 using namespace std;
 
+
 void main(int argc,char*argv[]) {
 	
 	auto result = Utility::getCommandLineArg("threads", argc, argv);
-	int threads = 1;
+	int threads = 4;
 	if (result.first) {
 		try {
 			threads = (int(stoi(result.second)));
@@ -21,6 +22,7 @@ void main(int argc,char*argv[]) {
 		}
 	};
 	BattleManager bm(".",threads);
-	bm.startTournament();
+	bm.runTournament();
 };
+
 
