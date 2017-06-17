@@ -56,6 +56,7 @@ void logicTest(vector<std::string> &dlls,vector<std::string> &games) {
 	}
 	cout << "result:" << endl << result<<endl;
 }
+/*
 void main(int argc,char*argv[]) {
 	
 	auto result = Utility::getCommandLineArg("threads", argc, argv);
@@ -71,4 +72,5 @@ void main(int argc,char*argv[]) {
 	BattleManager bm(".",threads);
 	
 };
+*/
 

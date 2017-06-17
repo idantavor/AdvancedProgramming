@@ -8,11 +8,10 @@ class UserFleet
 	UserFleet()= default;
 	~UserFleet();
 	std::pair<AttackResult, Ship*> UserFleet::executeAttack(Position & p) ;
-		bool isNotLose();
-		size_t getNumberOfShips() const;
-		void addShipToList(Ship* ship);
-		void clone(UserFleet& fleet);
-	protected:
-		std::list<Ship*> shipsList;
+	bool isNotLose();
+	size_t getNumberOfShips() const;
+	void addShipToList(Ship* ship);
+	void clone(UserFleet& fleet);
+	std::list<Ship*> shipsList;
 		
 };

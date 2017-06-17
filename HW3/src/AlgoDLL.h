@@ -6,6 +6,8 @@
 #include <mutex>
 #include "AlgoStat.h"
 #include "TournamentReporter.h"
+#include "logger.h"
+
 using namespace std;
 using GetAlgoFunctionPtr = IBattleshipGameAlgo* (*) ();
 
@@ -17,12 +19,10 @@ private:
 	string algName;
 	AlgoStat algStat;
 	TournamentReporter &tReporter;
-	void loadGetAlgFuncFromDLL(string path);
 
 public:
 	AlgoDLL(string dll_path,TournamentReporter &_tReporter):tReporter(_tReporter) {
 			algName = AlgoDLL::GetFileNameFromPath(dll_path);
-			loadGetAlgFuncFromDLL(dll_path);
 			algStat.setAlgName(algName);
 	}
 	
@@ -56,4 +56,6 @@ public:
 		this->algStat.losses += 1;
 		this->incGameCnt();
 	}
+
+	bool loadGetAlgFuncFromDLL(string path);
 };

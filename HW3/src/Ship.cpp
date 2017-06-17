@@ -135,7 +135,7 @@ void Ship::copyPositionList(std::list<Position> newPositionList, std::list<Posit
 {
 	for (std::list<Position>::iterator it = (oldPositionList).begin(); it != (oldPositionList).end(); ++it)
 	{
-		(newPositionList).push_back(Position(it->getX(), it->getY(), it->getX()));
+		(newPositionList).push_back(Position(it->getX(), it->getY(), it->getZ()));
 	}
 }
 

@@ -13,6 +13,7 @@
 #define SPACE ' '
 #include <iostream>
 #include <ctype.h>
+#include "logger.h"
 
 
 using namespace std;
