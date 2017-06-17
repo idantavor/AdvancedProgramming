@@ -23,8 +23,8 @@ void BattleManager::buildBattlesQueue()
 {
 	std::unordered_map<int, vector<pair<int, int>>> combinationMap;
 	//build all player combinations
-	for (size_t  i = 0; i<this->algorithms.size(); i ++ ) {
-		for (size_t  j = 0; j < this->algorithms.size(); j++) {
+	for (int  i = 0; i<this->algorithms.size(); i ++ ) {
+		for (int  j = 0; j < this->algorithms.size(); j++) {
 			if (i == j)continue;
 			if (combinationMap.find(i)!=combinationMap.end()) {
 				combinationMap.find(i)->second.push_back({ i,j });
@@ -38,8 +38,8 @@ void BattleManager::buildBattlesQueue()
 	}
 	//add to ThreadPool queue all of the battles in an even way
 	for (auto itr = this->gamesList.cbegin(); itr != gamesList.cend(); itr++) {
-		for (size_t  i = 0; i < this->algorithms.size() - 1; i++) {// i will be each dll combination index
-			for (size_t  j = 0; j < this->algorithms.size(); j++) {
+		for (int  i = 0; i < this->algorithms.size() - 1; i++) {// i will be each dll combination index
+			for (int  j = 0; j < this->algorithms.size(); j++) {
 				pair<int, int> combination = combinationMap.find(j)->second.at(i);
 				this->threadPool.addGameToQueue(&this->algorithms.at(combination.first), &this->algorithms.at(combination.second), *itr);
 			}
