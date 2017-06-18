@@ -62,4 +62,4 @@ public:
  * The reason that we don't return a unique_ptr instead, is that it is bad practice to export cpp methods due to their name mangling.
  * When working with shared objects (dlls), the interface must be a C interface.
  */
-//ALGO_API IBattleshipGameAlgo* GetAlgorithm(); // This method must be implemented in each player(algorithm) .cpp file
+ALGO_API IBattleshipGameAlgo* GetAlgorithm(); // This method must be implemented in each player(algorithm) .cpp file
