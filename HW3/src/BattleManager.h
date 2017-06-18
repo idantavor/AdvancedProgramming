@@ -29,8 +29,8 @@ public:
 	~BattleManager();
 	bool validateFilesExistance(const std::string & dirPath = "");
 	void loadBoardsInToGameManager(std::list<string> boardPaths);
-	//bool runBattle(const string& dirPath);
-
+	boolean isPairDistinct(const std::vector<pair<int, int>> &v, const pair<int, int> &p);
+	boolean isPairDistinctInOne(const std::vector<pair<int, int>> &v, const pair<int, int> &p);
 	std::list<GameData*> gamesList;
 	std::list<string> dllFilePaths;
 	void runTournament();
