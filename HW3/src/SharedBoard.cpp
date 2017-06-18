@@ -10,12 +10,15 @@ bool SharedBoard::loadBoard()
 	// That is faster than reading them one-by-one using the std::istream.
 	streambuf* borderStream = borderFile.rdbuf();
 
+	Logger logger("SharedBoard");
 	if (!handleSizesLine(borderStream)) {
+		DIMENSIONS_INCORRECT(boardPath, logger);
 		return false;
 	}
 
 	line = getNextLine(borderStream);
 	if (!line.empty()) {
+		FORMAT_INCORRECT(boardPath, logger);
 		return false;
 	}
 
@@ -209,7 +212,6 @@ bool SharedBoard::handleSizesLine(streambuf* borderStream) {
 		sizes.push_back(size);
 	}
 	if (sizes.size() != 3) {
-		Logger("SharedBoard").Warning("Sizes row is incurrect");
 		return false;
 	}
 
@@ -219,11 +221,9 @@ bool SharedBoard::handleSizesLine(streambuf* borderStream) {
 		depthSize = stoi(sizes[2], nullptr, 0);
 	}
 	catch (const invalid_argument&) {
-		Logger("SharedBoard").Warning("Sizes row is incurrect");
 		return false;
 	}
 	catch (const out_of_range&) {
-		Logger("SharedBoard").Warning("Sizes row is incurrect");
 		return false;
 	}
 

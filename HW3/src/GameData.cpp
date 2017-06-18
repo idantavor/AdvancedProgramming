@@ -82,24 +82,26 @@ bool GameData::loadAndValidateBoard(const string boardPath)
 		checksPass = false;
 
 	}
+
+	Logger logger("GameData");
 	for (std::list<char>::iterator it = (failedCharA).begin(); it != (failedCharA).end(); ++it)
 	{
-		WRONG_SIZE_A(*it, boardPath);
+		WRONG_SIZE_A(*it, boardPath, logger);
 	}
 	for (std::list<char>::iterator it = (failedCharB).begin(); it != (failedCharB).end(); ++it)
 	{
-		WRONG_SIZE_B(*it, boardPath);
+		WRONG_SIZE_B(*it, boardPath, logger);
 	}
 
 
 	size_t numberOfShipsA = fleetA.getNumberOfShips();
 	size_t numberOfShipsB = fleetB.getNumberOfShips();
 	if (numberOfShipsB < numberOfShipsA){
-		MORE_SHIP_A(numberOfShipsA, numberOfShipsB, boardPath);
+		MORE_SHIP_A(numberOfShipsA, numberOfShipsB, boardPath, logger);
 	}
 
 	else if (numberOfShipsB > numberOfShipsA) {
-		MORE_SHIP_B(numberOfShipsA, numberOfShipsB, boardPath);
+		MORE_SHIP_B(numberOfShipsA, numberOfShipsB, boardPath, logger);
 	}
 	else {
 		// Check if players as same number of ships
@@ -116,7 +118,7 @@ bool GameData::loadAndValidateBoard(const string boardPath)
 
 		for (int i = 0; i < 4; i++) {
 			if (aShip[i] != bShip[i]) {
-				DIFFERENT_SHIPS(boardPath);
+				DIFFERENT_SHIPS(boardPath, logger);
 				break;
 			}
 		}
@@ -126,7 +128,7 @@ bool GameData::loadAndValidateBoard(const string boardPath)
 
 	if (adjacentError)
 	{
-		Logger("GameData").Warning(ADJACENT(boardPath));
+		ADJACENT(boardPath, logger);
 		checksPass = false;
 	}
 

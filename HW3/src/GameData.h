@@ -20,12 +20,12 @@
 #include <iostream>
 #define A_TURN 0
 #define B_TURN 1
-#define WRONG_SIZE_A(c, path) Logger("GameData").Warning("Wrong size or shape for ship " + string(1,c) + " for player A, in board: " + path)
-#define WRONG_SIZE_B(c, path) Logger("GameData").Warning("Wrong size or shape for ship " + string(1,c) + " for player B, in board: " + path)
-#define ADJACENT(path) "Adjacent Ships on Board: " + path
-#define MORE_SHIP_A(a, b, path) Logger("GameData").Warning("Player A as more ships then player B, (Player A: " +  to_string(a) + " ,Player B: " + to_string(b) + ") in board: " + path)
-#define MORE_SHIP_B(a, b, path) Logger("GameData").Warning("Player B as more ships then player A, (Player A: " +  to_string(a) + " ,Player B: " + to_string(b) + ") in board: " + path)
-#define DIFFERENT_SHIPS(path) Logger("GameData").Warning("Players have different ships, in board: " + path)
+#define WRONG_SIZE_A(c, path, logger) logger.Warning("Wrong size or shape for ship " + string(1,c) + " for player A, in board: " + path)
+#define WRONG_SIZE_B(c, path, logger) logger.Warning("Wrong size or shape for ship " + string(1,c) + " for player B, in board: " + path)
+#define ADJACENT(path, logger) logger.Warning("Adjacent Ships on Board: " + path)
+#define MORE_SHIP_A(a, b, path, logger) logger.Warning("Player A has more ships then player B, (Player A: " +  to_string(a) + " ,Player B: " + to_string(b) + ") in board: " + path)
+#define MORE_SHIP_B(a, b, path, logger)logger.Warning("Player B has more ships then player A, (Player A: " +  to_string(a) + " ,Player B: " + to_string(b) + ") in board: " + path)
+#define DIFFERENT_SHIPS(path, logger) logger.Warning("Players have different ships, in board: " + path)
 
 #define SPACE ' '
 

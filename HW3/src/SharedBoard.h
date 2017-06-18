@@ -15,6 +15,9 @@
 #include <ctype.h>
 #include "logger.h"
 
+#define DIMENSIONS_INCORRECT(path, logger) logger.Warning("Board dimensions are incorrect in board: " + path)
+#define FORMAT_INCORRECT(path, logger) logger.Warning("Board format are incorrect in board: " + path)
+
 
 using namespace std;
 
