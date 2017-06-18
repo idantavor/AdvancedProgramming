@@ -37,4 +37,5 @@ void TournamentReporter::report(vector<AlgoStat>& algStatList)
 	for (size_t  i = 0; i < algStatList.size(); i++) {
 		this->printStat(algStatList.at(i), i + 1);
 	}
+	cout << endl;
 }

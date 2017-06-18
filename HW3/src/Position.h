@@ -16,7 +16,7 @@ public:
 	void setZ(int z);
 	void setPosition(int x, int y);
 	bool isAlive;
-	Position(Position& p);
+	
 	/*bool operator ==(const Position &p) {
 		return this->x_coord==p.x_coord && this->y_coord==p.y_coord && this->z_coord==p.z_coord;
 	}*/

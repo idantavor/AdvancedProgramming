@@ -13,41 +13,100 @@
 #include "Utility.h"
 #include <vector>
 #include "AlgoDLL.h"
-#include <unordered_map>
+#include <unordered_set>
 #include <queue>
 
 
-
-
+boolean isPairDistinct(const std::vector<pair<int, int>> &v, const pair<int, int> &p) {
+	for (const auto& pair : v) {
+		if (pair.first == p.first || pair.second == p.first || pair.first == p.second || pair.second == p.second) {
+			return false;
+		}
+	}
+	return true;
+}
+boolean isPairDistinctInOne(const std::vector<pair<int, int>> &v, const pair<int, int> &p) {
+	boolean first = true, second = true;
+	for (const auto& pair : v) {
+		if (pair.first == p.first || pair.second == p.first)  {
+			first=false;
+		}
+		if (pair.first == p.second || pair.second == p.second) {
+			second = false;
+		}
+	}
+	return first || second;
+}
 void BattleManager::buildBattlesQueue()
 {
-	std::unordered_map<int, vector<pair<int, int>>> combinationMap;
+	std::vector<pair<int, int>> combinations;
 	//build all player combinations
-	for (size_t  i = 0; i<this->algorithms.size(); i ++ ) {
-		for (size_t  j = 0; j < this->algorithms.size(); j++) {
+	for (size_t i = 0; i < this->algorithms.size(); i++) {
+		for (size_t j = 0; j < this->algorithms.size(); j++) {
 			if (i == j)continue;
-			if (combinationMap.find(i)!=combinationMap.end()) {
-				combinationMap.find(i)->second.push_back({ i,j });
-			}
-			else {
-				std::vector<pair<int,int>> v;
-				v.push_back({ i,j });
-				combinationMap.insert({ i,v });
-			}
+			combinations.push_back({ i,j });
 		}
 	}
+	boolean isNumOfAlgsEven = (this->algorithms.size() % 2) ? false : true;
+	int chunksize = isNumOfAlgsEven ? ((int)this->algorithms.size() / 2) : ((int)this->algorithms.size() / 2) + 1;
 	//add to ThreadPool queue all of the battles in an even way
-	for (auto itr = this->gamesList.cbegin(); itr != gamesList.cend(); itr++) {
-		for (size_t  i = 0; i < this->algorithms.size() - 1; i++) {// i will be each dll combination index
-			for (size_t  j = 0; j < this->algorithms.size(); j++) {
-				pair<int, int> combination = combinationMap.find(j)->second.at(i);
-				this->threadPool.addGameToQueue(&this->algorithms.at(combination.first), &this->algorithms.at(combination.second), *itr);
+	while (combinations.size() != 0) {
+		vector<pair<int, int>> chunk;
+		if (combinations.size() < chunksize) {
+			for (auto itr = combinations.begin(); itr != combinations.end();) {
+				chunk.push_back(*itr);
+				itr = combinations.erase(itr);
 			}
 		}
+		else {
+			while (chunk.size() < chunksize) {
+				for (auto itr = combinations.begin(); itr != combinations.end();) {
+					if (isPairDistinct(chunk, *itr) || (!isNumOfAlgsEven && chunk.size() == chunksize - 1 && isPairDistinctInOne(chunk, *itr))) {
+						chunk.push_back(*itr);
+						itr = combinations.erase(itr);
+					}
+					else itr++;
+				}
+			}
+		}
+		for (auto itr = this->gamesList.cbegin(); itr != gamesList.cend(); itr++) {
+			for (const auto& alg_pair : chunk) {
+				this->threadPool.addGameToQueue(&this->algorithms.at(alg_pair.first), &this->algorithms.at(alg_pair.second), *itr);
+			}
 
+		}
 	}
-	
 }
+
+//void BattleManager::buildBattlesQueue()
+//{
+//	std::unordered_map<int, vector<pair<int, int>>> combinationMap;
+//	//build all player combinations
+//	for (size_t  i = 0; i<this->algorithms.size(); i ++ ) {
+//		for (size_t  j = 0; j < this->algorithms.size(); j++) {
+//			if (i == j)continue;
+//			if (combinationMap.find(i)!=combinationMap.end()) {
+//				combinationMap.find(i)->second.push_back({ i,j });
+//			}
+//			else {
+//				std::vector<pair<int,int>> v;
+//				v.push_back({ i,j });
+//				combinationMap.insert({ i,v });
+//			}
+//		}
+//	}
+//	//add to ThreadPool queue all of the battles in an even way
+//	for (auto itr = this->gamesList.cbegin(); itr != gamesList.cend(); itr++) {
+//		for (size_t  i = 0; i < this->algorithms.size() - 1; i++) {// i will be each dll combination index
+//			for (size_t  j = 0; j < this->algorithms.size(); j++) {
+//				pair<int, int> combination = combinationMap.find(j)->second.at(i);
+//				this->threadPool.addGameToQueue(&this->algorithms.at(combination.first), &this->algorithms.at(combination.second), *itr);
+//			}
+//		}
+//
+//	}
+//	
+//}
 
 BattleManager::BattleManager(string boardPaths,int numOfThreads)
 {
@@ -89,9 +148,10 @@ bool BattleManager::validateFilesExistance(const std::string& dirPath) {
 		cout << "Wrong path : " << searchIn << endl;
 		return false;
 	}
-
-	Logger("BattleManager").setLogPath(searchIn);
-	Logger("BattleManager").Info("Start running progrem");
+	Logger logger = Logger("BattleManager");
+	logger.setLogPath(searchIn);
+	
+	logger.Info("Start running program");
 	
 	//get file names in dir path
 	vector<string> fileNames;
@@ -109,13 +169,13 @@ bool BattleManager::validateFilesExistance(const std::string& dirPath) {
 	if(boardsFilesPath.size() == 0)
 	{
 		cout << errors[0] << searchIn << endl;
-		Logger("BattleManager").Error(errors[0] + searchIn);
+		logger.Error(errors[0] + searchIn);
 		isFilesFound = false;
 	}
 
 	if(dllFilePaths.size() <2 ){
 		cout << errors[1] << searchIn << endl;
-		Logger("BattleManager").Error(errors[1] + searchIn);
+		logger.Error(errors[1] + searchIn);
 		isFilesFound = false;
 	}
 

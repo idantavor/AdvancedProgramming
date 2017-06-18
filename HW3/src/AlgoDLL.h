@@ -23,12 +23,13 @@ private:
 public:
 	AlgoDLL(string dll_path,TournamentReporter &_tReporter):tReporter(_tReporter) {
 			algName = AlgoDLL::GetFileNameFromPath(dll_path);
-			algStat.setAlgName(algName);
+			algStat.algName = algName;
 	}
 	
 	AlgoDLL(const AlgoDLL &a):tReporter(a.tReporter) {
 		this->getAlgoFunc = a.getAlgoFunc;
 		this->algName = a.algName;
+		this->algStat = a.algStat;
 
 	};
 	AlgoDLL& operator =(const AlgoDLL&) = delete;
@@ -41,23 +42,34 @@ public:
 		return path.substr(lastSlashIndex + 1);
 	}
 	
-	void  addWin() {
+	void  addWin(int pointsFor,int pointsAgainst) {
 		std::lock_guard<std::mutex> lock(editLock);
 		this->algStat.wins += 1;
-		this->incGameCnt();
+		this->incGameCnt(pointsFor,pointsAgainst);
 	}
 
-	void incGameCnt() {
+	void incGameCnt(int pointsFor, int pointsAgainst) {
 		this->algStat.totalGames+= 1;
+		this->algStat.pointsFor += pointsFor;
+		this->algStat.pointsAgainst+=pointsAgainst;
 		tReporter.notifyStat(this->algStat);
 		
 	}
 
-	void addLose() {
+	void addDraw(int pointsFor, int pointsAgainst) {
+		std::lock_guard<std::mutex> lock(editLock);
+		this->incGameCnt(pointsFor, pointsAgainst);
+	}
+
+	void addLose(int pointsFor, int pointsAgainst) {
 		std::lock_guard<std::mutex> lock(editLock);
 		this->algStat.losses += 1;
-		this->incGameCnt();
+		this->incGameCnt(pointsFor, pointsAgainst);
 	}
 
 	bool loadGetAlgFuncFromDLL(string path);
+
+	string getName() {
+		return algName;
+	}
 };

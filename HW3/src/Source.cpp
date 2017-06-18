@@ -11,8 +11,17 @@ using namespace std;
 
 void main(int argc,char*argv[]) {
 	
+	// get command line path
+	string path = ".";
+	if (argc > 1) {
+		if (argv[1][0] != '-') {
+			path = argv[1];
+		}
+	}
+
+	// get thread number - default is 4
 	auto result = Utility::getCommandLineArg("threads", argc, argv);
-	int threads = 1;
+	int threads = 4;
 	if (result.first) {
 		try {
 			threads = (int(stoi(result.second)));
@@ -21,7 +30,7 @@ void main(int argc,char*argv[]) {
 
 		}
 	};
-	BattleManager bm(".",threads);
+	BattleManager bm(path,threads);
 	bm.runTournament();
 };
 

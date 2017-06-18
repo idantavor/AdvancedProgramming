@@ -5,12 +5,11 @@
 
 #include "BattleShipGameSmartAlgo.h"
 
-//bool operator==(Coordinate &a, Coordinate&b) {
-//	return a.col == b.col && a.depth == b.depth && a.row == b.row;
-//}
 
 bool BattleThreadPool::runBattle(AlgoDLL *dllA, AlgoDLL *dllB, GameData *bd)
 {
+	Logger logger = Logger("runBattleThread");
+	logger.Info("running Battle between " + dllA->getName() + " and " + dllB->getName());
 	unique_ptr<IBattleshipGameAlgo> playerA, playerB;
 	playerA = unique_ptr<IBattleshipGameAlgo>({ dllA->GetAlgoInstance() });
 	playerB= unique_ptr<IBattleshipGameAlgo>({ dllB->GetAlgoInstance() });
@@ -28,7 +27,8 @@ bool BattleThreadPool::runBattle(AlgoDLL *dllA, AlgoDLL *dllB, GameData *bd)
 
 	while (true) {
 		if (playerAFin && playerBFin) {
-			// ask ALON what to do here???? who wins?!
+			dllA->addDraw(playerAScore, playerBScore);
+			dllB->addDraw(playerBScore, playerAScore);
 			return true;
 		}
 		auto currAttack = (currentTurn == A_TURN) ? playerA->attack() : playerB->attack();
@@ -75,13 +75,13 @@ bool BattleThreadPool::runBattle(AlgoDLL *dllA, AlgoDLL *dllB, GameData *bd)
 		playerB->notifyOnAttackResult(currentTurn, currAttack, unifiedRes); //notify B
 
 		if (!gameData.fleetA.isNotLose()) { // a lost meaning b won
-			dllA->addLose();
-			dllB->addWin();
+			dllA->addLose(playerAScore,playerBScore);
+			dllB->addWin(playerBScore,playerAScore);
 			return true;
 		}
 		if (!gameData.fleetB.isNotLose()) { // B lost meaning A won
-			dllA->addWin();
-			dllB->addLose();
+			dllA->addWin(playerAScore,playerBScore);
+			dllB->addLose(playerBScore,playerAScore);
 			return true;
 		}
 		if (shouldSwitchTurn) {

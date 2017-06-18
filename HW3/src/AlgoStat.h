@@ -11,10 +11,11 @@ public:
 	string algName;
 	
 	AlgoStat(string _algName): algName(_algName) {
-	}
+	};
 
 	AlgoStat() {
-	}
+	};
+	AlgoStat(const AlgoStat &stat);
 	
 	void setAlgName(string name) {
 		algName = name;

@@ -45,7 +45,7 @@ private:
 		printElement(percentage, numWidth);
 		printElement(stat.pointsFor, pointWidth);
 		printElement(stat.pointsAgainst, pointWidth);
-		cout << endl<<endl;
+		cout << endl<<flush;
 	}
 public:
 	TournamentReporter(size_t _algNum) :algNum(_algNum) {};
@@ -67,17 +67,7 @@ public:
 		this->stopMonitor = true;
 		this->monitorThread->join();
 	}
-	void test() {
-		printHeader();
-		AlgoStat alg("idan the king");
-		alg.wins = 1000;
-		alg.losses = 2;
-		alg.totalGames = 1002;
-		alg.pointsFor = 2;
-		alg.pointsAgainst = 3;
-		printStat(alg,100);
-	
-	}
+
 
 	
 };
