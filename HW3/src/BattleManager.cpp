@@ -17,7 +17,7 @@
 #include <queue>
 
 
-boolean isPairDistinct(const std::vector<pair<int, int>> &v, const pair<int, int> &p) {
+boolean BattleManager::isPairDistinct(const std::vector<pair<int, int>> &v, const pair<int, int> &p) {
 	for (const auto& pair : v) {
 		if (pair.first == p.first || pair.second == p.first || pair.first == p.second || pair.second == p.second) {
 			return false;
@@ -25,7 +25,7 @@ boolean isPairDistinct(const std::vector<pair<int, int>> &v, const pair<int, int
 	}
 	return true;
 }
-boolean isPairDistinctInOne(const std::vector<pair<int, int>> &v, const pair<int, int> &p) {
+boolean BattleManager::isPairDistinctInOne(const std::vector<pair<int, int>> &v, const pair<int, int> &p) {
 	boolean first = true, second = true;
 	for (const auto& pair : v) {
 		if (pair.first == p.first || pair.second == p.first)  {
@@ -37,6 +37,7 @@ boolean isPairDistinctInOne(const std::vector<pair<int, int>> &v, const pair<int
 	}
 	return first || second;
 }
+
 void BattleManager::buildBattlesQueue()
 {
 	std::vector<pair<int, int>> combinations;
@@ -78,35 +79,7 @@ void BattleManager::buildBattlesQueue()
 	}
 }
 
-//void BattleManager::buildBattlesQueue()
-//{
-//	std::unordered_map<int, vector<pair<int, int>>> combinationMap;
-//	//build all player combinations
-//	for (size_t  i = 0; i<this->algorithms.size(); i ++ ) {
-//		for (size_t  j = 0; j < this->algorithms.size(); j++) {
-//			if (i == j)continue;
-//			if (combinationMap.find(i)!=combinationMap.end()) {
-//				combinationMap.find(i)->second.push_back({ i,j });
-//			}
-//			else {
-//				std::vector<pair<int,int>> v;
-//				v.push_back({ i,j });
-//				combinationMap.insert({ i,v });
-//			}
-//		}
-//	}
-//	//add to ThreadPool queue all of the battles in an even way
-//	for (auto itr = this->gamesList.cbegin(); itr != gamesList.cend(); itr++) {
-//		for (size_t  i = 0; i < this->algorithms.size() - 1; i++) {// i will be each dll combination index
-//			for (size_t  j = 0; j < this->algorithms.size(); j++) {
-//				pair<int, int> combination = combinationMap.find(j)->second.at(i);
-//				this->threadPool.addGameToQueue(&this->algorithms.at(combination.first), &this->algorithms.at(combination.second), *itr);
-//			}
-//		}
-//
-//	}
-//	
-//}
+
 
 BattleManager::BattleManager(string boardPaths,int numOfThreads)
 {

@@ -32,7 +32,7 @@ void TournamentReporter::handleQueue()
 void TournamentReporter::report(vector<AlgoStat>& algStatList)
 {
 	
-	sort(algStatList.begin(), algStatList.end(), [](const AlgoStat & first, const AlgoStat & second) {return first.wins > second.wins; });
+	sort(algStatList.begin(), algStatList.end(), [](const AlgoStat & first, const AlgoStat & second) {if (first.wins == second.wins)return first.pointsFor > second.pointsFor;else return first.wins > second.wins; });
 	this->printHeader();
 	for (int  i = 0; i < algStatList.size(); i++) {
 		this->printStat(algStatList.at(i), i + 1);
