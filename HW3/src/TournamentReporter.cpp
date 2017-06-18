@@ -34,7 +34,7 @@ void TournamentReporter::report(vector<AlgoStat>& algStatList)
 	
 	sort(algStatList.begin(), algStatList.end(), [](const AlgoStat & first, const AlgoStat & second) {return first.wins > second.wins; });
 	this->printHeader();
-	for (size_t  i = 0; i < algStatList.size(); i++) {
+	for (int  i = 0; i < algStatList.size(); i++) {
 		this->printStat(algStatList.at(i), i + 1);
 	}
 	cout << endl;

@@ -41,8 +41,8 @@ void BattleManager::buildBattlesQueue()
 {
 	std::vector<pair<int, int>> combinations;
 	//build all player combinations
-	for (size_t i = 0; i < this->algorithms.size(); i++) {
-		for (size_t j = 0; j < this->algorithms.size(); j++) {
+	for (int i = 0; i < this->algorithms.size(); i++) {
+		for (int j = 0; j < this->algorithms.size(); j++) {
 			if (i == j)continue;
 			combinations.push_back({ i,j });
 		}
