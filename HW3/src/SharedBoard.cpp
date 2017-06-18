@@ -154,7 +154,7 @@ void SharedBoard::addLineToBoard(string& line, unsigned int depth, unsigned int 
 	if (rowLine.size() < colsSize)
 	{
 		//case the line is shorter then boarder size
-		auto spaceSize = colsSize - rowLine.size();
+		unsigned int spaceSize = colsSize - rowLine.size();
 		rowLine.append(string(spaceSize, SPACE));
 
 	}
@@ -218,11 +218,11 @@ bool SharedBoard::handleSizesLine(streambuf* borderStream) {
 		rowsSize = stoi(sizes[1], nullptr, 0);
 		depthSize = stoi(sizes[2], nullptr, 0);
 	}
-	catch (const invalid_argument&) {
+	catch (const invalid_argument& ia) {
 		Logger("SharedBoard").Warning("Sizes row is incurrect");
 		return false;
 	}
-	catch (const out_of_range&) {
+	catch (const out_of_range& ia) {
 		Logger("SharedBoard").Warning("Sizes row is incurrect");
 		return false;
 	}

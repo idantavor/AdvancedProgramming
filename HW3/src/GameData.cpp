@@ -330,7 +330,7 @@ bool GameData::isSpacesAreOK(unsigned int x, unsigned int y, unsigned int z, cha
 	return true;
 }
 
-bool GameData::checkSpacesInPosition(int  x, int y, int z, char c) const
+bool GameData::checkSpacesInPosition(size_t  x, size_t y, size_t z, char c) const
 {
 	if (x > 0 && y > 0 && z > 0 && x < board->getRowSize() && y < board->getColSize() && z <  board->getDepthSize() && board->getCharAt(x, y, z) != c && board->getCharAt(x, y, z) != ' ') {
 		return false;

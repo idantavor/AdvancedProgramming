@@ -54,7 +54,7 @@ private:
 
 	bool isSpacesAreOK(unsigned int depth, unsigned int length, unsigned int width, char c) const;
 
-	bool checkSpacesInPosition(int x, int y, int z, char c) const;
+	bool checkSpacesInPosition(size_t x, size_t y, size_t z, char c) const;
 	IBattleshipGameAlgo* playerAlgoA = nullptr;
 	IBattleshipGameAlgo* playerAlgoB = nullptr;
 
