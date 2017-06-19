@@ -267,7 +267,10 @@ unsigned int  SharedBoard::getColSize()
 	return colsSize;
 }
 
-char SharedBoard::getCharAt(int x, int y, int z)
+char SharedBoard::getCharAt(size_t x, size_t y, size_t z)
 {
+	if (x < 0 || y < 0 || z < 0 || x >= getRowSize() || y >= getColSize() || z >= getDepthSize()) {
+		return SPACE;
+	}
 	return board[z][x][y];
 }

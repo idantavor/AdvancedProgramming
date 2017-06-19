@@ -30,7 +30,7 @@ public:
 	unsigned int  getRowSize();
 	unsigned int  getDepthSize();
 	unsigned int  getColSize();
-	char getCharAt(int x, int y, int z);
+	char getCharAt(size_t x, size_t y, size_t z);
 
 private:
 
