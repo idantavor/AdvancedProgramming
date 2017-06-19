@@ -91,6 +91,14 @@ BattleManager::BattleManager(string boardPaths,int numOfThreads)
 			this->algorithms.push_back(algo);
 		}
 	}
+
+	// report
+	cout << NUMBER_OF_LEGAL_PLAYERS(this->algorithms.size()) << endl;
+	cout <<  NUMBER_OF_LEGAL_BOARDS(this->gamesList.size()) << endl;
+	Logger logger = Logger("BattleManager");
+	logger.Info(NUMBER_OF_LEGAL_PLAYERS(this->algorithms.size()));
+	logger.Info(NUMBER_OF_LEGAL_BOARDS(this->gamesList.size()));
+
 	this->tRporter.setAlgNum(this->algorithms.size());
 	this->threadNum = numOfThreads;
 	this->buildBattlesQueue();

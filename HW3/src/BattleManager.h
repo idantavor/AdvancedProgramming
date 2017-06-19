@@ -11,7 +11,8 @@
 #include "TournamentReporter.h"
 #include "BattleThreadPool.h"
 #include "logger.h"
-
+#define NUMBER_OF_LEGAL_PLAYERS(c)  "Number of legal players: " + to_string(c)
+#define NUMBER_OF_LEGAL_BOARDS(c) "Number of legal boards: " + to_string(c)
 
 
 using namespace std;
