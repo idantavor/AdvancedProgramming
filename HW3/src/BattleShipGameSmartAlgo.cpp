@@ -102,9 +102,9 @@ Coordinate BattleShipGameSmartAlgo::attack() {
 void BattleShipGameSmartAlgo::addAttackedPointToShipsList(Coordinate& attackedPoint)
 {
 	//go over all the ships
-	for (list<set<Coordinate>>::iterator shipIter = m_shipsUnderAttack.begin(); shipIter != m_shipsUnderAttack.end(); shipIter++) {
+	for (list<unordered_set<Coordinate, CoordHash>>::iterator shipIter = m_shipsUnderAttack.begin(); shipIter != m_shipsUnderAttack.end(); shipIter++) {
 		//for each ship go over all points
-		for (set<Coordinate>::iterator pointIter = shipIter->begin(); pointIter != shipIter->end(); pointIter++) {
+		for (unordered_set<Coordinate, CoordHash>::iterator pointIter = shipIter->begin(); pointIter != shipIter->end(); pointIter++) {
 			if (areAdjacent(attackedPoint, *pointIter)) {
 				//the attacked point is part of this ship
 				shipIter->insert(attackedPoint);
@@ -113,7 +113,7 @@ void BattleShipGameSmartAlgo::addAttackedPointToShipsList(Coordinate& attackedPo
 		}
 	}
 	//if we got here meaning we could not find an appropriate place for this point, add it as a new ship
-	set<Coordinate> newShip;
+	unordered_set<Coordinate, CoordHash> newShip;
 	newShip.insert(attackedPoint);
 	m_shipsUnderAttack.push_back(newShip);
 }
@@ -121,7 +121,7 @@ void BattleShipGameSmartAlgo::addAttackedPointToShipsList(Coordinate& attackedPo
 void BattleShipGameSmartAlgo::removeSunkShipFromShipsListAndMarkPlacesAsSunk(Coordinate& attackedPoint)
 {
 	//take all the points that are part of the sunk ship, remove the resulting ships from m_shipsUnderAttack 
-	set<Coordinate> sunkShip;
+	unordered_set<Coordinate, CoordHash> sunkShip;
 	sunkShip.insert(attackedPoint);
 	bool foundShip = true;
 	while (foundShip) {
@@ -157,7 +157,7 @@ void BattleShipGameSmartAlgo::removeSunkShipFromShipsListAndMarkPlacesAsSunk(Coo
 
 
 Coordinate BattleShipGameSmartAlgo::getNextDestroyPosition() {
-	set<Coordinate>* shipUnderAttack = getShipUnderAttack();
+	unordered_set<Coordinate, CoordHash>* shipUnderAttack = getShipUnderAttack();
 	if (shipUnderAttack == nullptr) {//sanity shouldn't happen
 		return CORD_NO_MATCH;
 	}
@@ -175,7 +175,7 @@ Coordinate BattleShipGameSmartAlgo::getNextDestroyPosition() {
 	}
 	else if (shipUnderAttack->size() > 1) {// more than one point -> direction is known
 		//take two points from the attacked ship
-		std::set<Coordinate>::const_iterator it = shipUnderAttack->cbegin();
+		std::unordered_set<Coordinate, CoordHash>::const_iterator it = shipUnderAttack->cbegin();
 		Coordinate p1 = *it;
 		Coordinate p2 = *(++it);
 		if (abs(p1.row - p2.row) > 0) {// row - row > 0 -> vertical
@@ -357,7 +357,7 @@ bool BattleShipGameSmartAlgo::isInBoard(Coordinate& c)
 	}
 }
 
-std::pair<int, int> BattleShipGameSmartAlgo::getMinMax(set<Coordinate>& setOfPoints, char rowOrColOrDepth)
+std::pair<int, int> BattleShipGameSmartAlgo::getMinMax(unordered_set<Coordinate, CoordHash>& setOfPoints, char rowOrColOrDepth)
 {
 	int minVal = std::max(m_colNum, m_rowNum);
 	minVal = std::max(minVal, m_depthNum);
@@ -404,7 +404,7 @@ Coordinate BattleShipGameSmartAlgo::fromRealIndexToRepresnt(const Coordinate& c)
 }
 
 
-set<Coordinate>* BattleShipGameSmartAlgo::getShipUnderAttack()
+unordered_set<Coordinate, CoordHash>* BattleShipGameSmartAlgo::getShipUnderAttack()
 {
 	if (m_shipsUnderAttack.size() == 0 ){
 		return nullptr;
@@ -423,10 +423,10 @@ bool BattleShipGameSmartAlgo::areAdjacent(const Coordinate& p1, const Coordinate
 	}
 }
 
-bool BattleShipGameSmartAlgo::areShipsAdjacent(const set<Coordinate>& s1, const set<Coordinate>& s2)
+bool BattleShipGameSmartAlgo::areShipsAdjacent(const unordered_set<Coordinate, CoordHash>& s1, const unordered_set<Coordinate, CoordHash>& s2)
 {
-	for (set<Coordinate>::iterator p1Iter = s1.begin(); p1Iter != s1.end(); p1Iter++) {
-		for (set<Coordinate>::iterator p2Iter = s2.begin(); p2Iter != s2.end(); p2Iter++) {
+	for (unordered_set<Coordinate, CoordHash>::iterator p1Iter = s1.begin(); p1Iter != s1.end(); p1Iter++) {
+		for (unordered_set<Coordinate, CoordHash>::iterator p2Iter = s2.begin(); p2Iter != s2.end(); p2Iter++) {
 			if (areAdjacent(*p1Iter, *p2Iter)) {
 				return true;
 			}

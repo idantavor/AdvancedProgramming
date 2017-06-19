@@ -15,6 +15,7 @@ public:
 
 	AlgoStat() {
 	};
+
 	AlgoStat(const AlgoStat &stat);
 	
 	void setAlgName(string name) {

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-
+#include <sstream>
 using namespace std;
 
 class Utility{
@@ -17,9 +17,13 @@ static bool operator==(const Coordinate& c1, const Coordinate& c2) {
 	return c1.col == c2.col && c1.row == c2.row && c1.depth == c2.depth;
 }
 
-static bool operator<(const Coordinate& c1, const Coordinate& c2) {
-	return (c1.col + c1.row + c1.depth) < (c2.row + c2.col + c2.depth);
-}
 
+struct CoordHash {
+	size_t operator()(const Coordinate &c)const {
+		stringstream numstr;
+		numstr << c.col << c.row << c.depth;
+		return static_cast<size_t>(stoi(numstr.str()));
+	}
+};
 
 

@@ -53,6 +53,7 @@ void Utility::printFinishMsg(int scoreA, int scoreB, int winner) { // winner A_T
 	cout << "Player B: " << scoreB << endl;
 }
 
+
 bool Utility::dirExists(const std::string& dirName_in)
 {
 	DWORD ftyp = GetFileAttributesA(dirName_in.c_str());

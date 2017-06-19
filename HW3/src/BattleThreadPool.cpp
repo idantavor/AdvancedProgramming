@@ -15,15 +15,15 @@ bool BattleThreadPool::runBattle(AlgoDLL *dllA, AlgoDLL *dllB, GameData *bd)
 	playerB= unique_ptr<IBattleshipGameAlgo>({ dllB->GetAlgoInstance() });
 	GameData gameData;
 	bd->clone(gameData);
-	UserGameData playerAData(0,gameData.board);
-	UserGameData playerBData(1, gameData.board);
-	playerA->setPlayer(0);//change to MACRO
+	UserGameData playerAData(A_TURN,gameData.board);
+	UserGameData playerBData(B_TURN, gameData.board);
+	playerA->setPlayer(A_TURN);
 	playerA->setBoard(playerAData);
-	playerB->setPlayer(1);
+	playerB->setPlayer(B_TURN);
 	playerB->setBoard(playerBData);
-	int currentTurn = 0;// A turn when 0 , B turn when 1;
+	int currentTurn = A_TURN;// A turn when 0 , B turn when 1;
 	bool playerAFin = false; bool playerBFin = false;
-	int playerAScore = 0; int playerBScore = 0;
+	int playerAScore = 0; int playerBScore = 0; 
 
 	while (true) {
 		if (playerAFin && playerBFin) {

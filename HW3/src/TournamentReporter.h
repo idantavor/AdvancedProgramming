@@ -25,28 +25,8 @@ private:
 		cout << left << setw(width) << setfill(separator) << t;
 	}
 
-	void printHeader() {
-		printElement("#", numWidth);
-		printElement("Team Name", nameWidth);
-		printElement("wins", numWidth);
-		printElement("losses", numWidth);
-		printElement("%", numWidth);
-		printElement("Points For", pointWidth);
-		printElement("Points Against", pointWidth);
-		cout << endl << endl;
-	}
-	void printStat(AlgoStat& stat,int number) {
-		printElement(std::to_string(number)+'.', numWidth);
-		printElement(stat.algName, nameWidth);
-		printElement(stat.wins, numWidth);
-		printElement(stat.losses, numWidth);
-		float percentage = (stat.totalGames == 0) ? 0 : (float(stat.wins) / (stat.wins + stat.losses)) * 100;
-		cout << setprecision(2)<<fixed;
-		printElement(percentage, numWidth);
-		printElement(stat.pointsFor, pointWidth);
-		printElement(stat.pointsAgainst, pointWidth);
-		cout << endl<<flush;
-	}
+	void printHeader(); 
+	void printStat(AlgoStat& stat, int number); 
 public:
 	TournamentReporter(size_t _algNum) :algNum(_algNum) {};
 	

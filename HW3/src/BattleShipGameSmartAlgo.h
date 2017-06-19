@@ -1,12 +1,14 @@
 #pragma once
 #include "IBattleshipGameAlgo.h"
 #include "Position.h"
+#include <unordered_set>
 #include <set>
 #include <vector>
 #include <list>
 #include <cmath> 
 #include <algorithm>  
 #include <time.h>
+#include "Utility.h"
 
 
 //GENERAL NOTICE
@@ -52,9 +54,9 @@ private:
 	int m_mode;	// search or destroy
 	char*** m_statusBoard; //the game's state in the eyes of the algo
 	int***	m_probBoard; //possible ships in this square
-	list<set<Coordinate>> m_shipsUnderAttack;
+	list<unordered_set<Coordinate,CoordHash>> m_shipsUnderAttack;
 	list<int> m_leftShipsOfOpponent;
-	set<Coordinate> m_myShips;
+	unordered_set<Coordinate,CoordHash> m_myShips;
 
 	Coordinate getNextDestroyPosition();
 	void addAttackedPointToShipsList(Coordinate& attackedPoint);//addes the attacked point to the list of ships, either to an existing ship, or creates a new one
@@ -62,15 +64,15 @@ private:
 	Coordinate getSearchPoint();
 	bool checkSurrondingPoint(Coordinate& c);//makes sure that a point is eithr out of range, or does not contain a ship, or is part of the attacked ship 
 	bool isInBoard(Coordinate& c);
-	std::pair<int, int> getMinMax(set<Coordinate>& setOfPoints, char rowOrColOrDepth); //retruns the <min,max> row/col/depth in the set. 'r' for row, 'c' for col 'd' for depth
-	set <Coordinate>* getShipUnderAttack(); // returns the first ship under attack, or NULL if such one does not exist
+	std::pair<int, int> getMinMax(unordered_set<Coordinate, CoordHash>& setOfPoints, char rowOrColOrDepth); //retruns the <min,max> row/col/depth in the set. 'r' for row, 'c' for col 'd' for depth
+	unordered_set <Coordinate, CoordHash>* getShipUnderAttack(); // returns the first ship under attack, or NULL if such one does not exist
 	void tryToPlaceShip(int shipSize); // tries to place a ship in the given stating position
 	bool validatePoint(Coordinate& c);  //checks if this position can contain a ship, only relevant during search mode,
 	void zeroProbBoard();
 
 	//static functions
 	static bool areAdjacent(const Coordinate& p1, const Coordinate& p2);//returns true if the points are next to each other, false o.w
-	static bool areShipsAdjacent(const set<Coordinate>& s1, const set<Coordinate>& s2);
+	static bool areShipsAdjacent(const unordered_set<Coordinate, CoordHash>& s1, const unordered_set<Coordinate, CoordHash>& s2);
 	static Coordinate fromRepresntToRealIndex(const Coordinate& c);
 	static Coordinate fromRealIndexToRepresnt(const Coordinate& c);
 	static void countShips(const BoardData& bd, list<int>& listToFill);
