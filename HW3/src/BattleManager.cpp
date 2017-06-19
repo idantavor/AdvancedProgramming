@@ -83,7 +83,9 @@ void BattleManager::buildBattlesQueue()
 
 BattleManager::BattleManager(string boardPaths,int numOfThreads)
 {
-	validateFilesExistance(boardPaths);
+	if (!validateFilesExistance(boardPaths)) {
+		return;
+	}
 	//added const copy cnt'r in order to support vector insertion
 	for (auto stringItr = this->dllFilePaths.begin(); stringItr != this->dllFilePaths.end(); stringItr++) {
 		AlgoDLL algo(*stringItr, this->tRporter);
