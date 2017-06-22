@@ -23,13 +23,19 @@ private:
 		return true;
 	}
 
-	void sorteGroup() {
+	void sortGroup() {
 		positionList.sort(comparePoints);
 	}
 
 	std::list<Point<nDimensions>> getGruop() {
 		return positionList;
 	}
+
+	void addPoint(Point<nDimensions> p) {
+		positionList.push_back(p);
+	}
+
+
 };
 
 
