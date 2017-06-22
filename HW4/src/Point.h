@@ -73,6 +73,8 @@ public:
 		Point({ pos... });
 	}
 
+
+
 	/*
 	Point(int x, int y)
 	{
