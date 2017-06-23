@@ -2,6 +2,9 @@
 #include <iostream>
 #include "Point.h"
 #include <memory>
+#include "Group.h"
+#include <list>
+#include <map>
 #include <array>            // std::array
 
 #define STATIC_ASSERT( e ) static_assert( e, "!(" #e ")" )
@@ -160,98 +163,129 @@ public:
 		return out;
 	}
 
-	template< typename G = T, typename Func>
-	void GameData::collectGroup(Point p, G typeOFGroup, bool& visitBoard, Func func) const {
-
-		for(auto )
-	}
-	
-	template< typename G = T, typename Func>
+	template< typename G = T, typename Func, typename P>
 	void groupValues(Func func) {
+
 
 		//Insilize visit board
 		visitArray = std::make_unique<bool[]>(_size); // "zero initialized" - T()
 		MatrixValueInitilaizer<T, bool, DIMENSIONS>::valueInitilaize(&(visitArray[i * _size]), _array, _size, _dimensions, false);
 
+		std::map<P, std::list<Group<DIMENSIONS>>> types;
 
-		//create boards and do checks
-		for (int row = 0; row < ROWS; row++) {
-			string matrixRow = matrix[row];
-			for (int column = 0; column < COLS; column++)
-			{
-				T type = matrixRow[column];
-				if (visitBoard[row][column]) {
-					continue;
+
+		if (_DIMENSIONS == 2) {
+			//create boards and do checks
+			for (int row = 0; row < ROWS; row++) {
+				string matrixRow = _array[row];
+				for (int column = 0; column < COLS; column++)
+				{
+					P type = func(_array[Row][column]);
+					if (visitArray[row][column]) {
+						continue;
+					}
+					Group<_DIMENSIONS> g();
+					<T, Func> collectGroup(row, column, type, visitArray, func, g);
+					bool typeNotExists = m.find(chck) == m.end();
+					if (typeNotExists) {
+						types[type] = std::list<Group<_DIMENSIONS>>(g);
+					}
+					else{
+						types[type].push_back(g);
+					}
 				}
+			}
+		}
 
-				<T, Func> collectGroup(row, column, type, visitBoard, func);
+		else if (_DIMENSIONS == 3) {
+			//create boards and do checks
+			for (int depth = 0; row; row++) {
+				for (int row = 0; row < ROWS; row++) {
+					string matrixRow = matrix[row];
+					for (int column = 0; column < COLS; column++)
+					{
+						P type = func(_array[Row][column]);
+						if (visitArray[row][column]) {
+							continue;
+						}
+						Group<_DIMENSIONS> g();
+						<T, Func> collectGroup(row, column, type, visitArray, func, g);
+						bool typeNotExists = m.find(chck) == m.end();
+						if (typeNotExists) {
+							types[type] = std::list<Group<_DIMENSIONS>>(g);
+						}
+						else {
+							types[type].push_back(g);
+						}
+
+					}
+				}
 			}
 		}
 	}
 
 
-	template<typename G = T, typename Func>
-	void Matrix::collectGroup(Point p , T type,  visitMatrix, Func func) const {
+	template<typename G = T, typename Func, typename P>
+	void Matrix::collectGroup(int x, int y , P type,  visitMatrix, Func func, Group<_DIMENSIONS>& g) const {
 		STATIC_ASSERT(DIMENSIONS == 2);
 		visitBoard[x][y] = true;
-		ship.addPointToTheList(x, y);
+		g.addPoint(new Point2D(x, y));
 		int x_i = x + 1;
-		if (x_i >= 0 && x_i < ROWS && !visitBoard[x_i][y] && func(matrix[x_i][y]) == func(type))
+		if (x_i >= 0 && x_i < ROWS && !visitMatrix[x_i][y] && func(_array[x_i][y]) == func(type))
 		{
-			shipCollectChars(x_i, y, type, visitBoard, ship);
+			shipCollectChars(x_i, y, type, visitMatrix, func, g);
 		}
 		int y_i = y + 1;
-		if (y_i >= 0 && y_i < COLS && !visitBoard[x][y_i] && func(matrix[x][y_i]) == func(type))
+		if (y_i >= 0 && y_i < COLS && !visitMatrix[x][y_i] && func(_array[x][y_i]) == func(type))
 		{
-			shipCollectChars(x, y_i, type, visitBoard, ship);
+			shipCollectChars(x, y_i, type, visitMatrix, func, g);
 		}
 		x_i = x - 1;
-		if (x_i >= 0 && x_i < ROWS && !visitBoard[x_i][y] && func(matrix[x_i][y]) == func(type))
+		if (x_i >= 0 && x_i < ROWS && !visitMatrix[x_i][y] && func(_array[x_i][y]) == func(type))
 		{
-			shipCollectChars(x_i, y, type, visitBoard, ship);
+			shipCollectChars(x_i, y, type, visitMatrix, func, g);
 		}
 		y_i = y - 1;
-		if (y_i >= 0 && y_i < COLS &&
-			!visitBoard[x][y_i] && func(matrix[x][y_i]) == func(type))
+		if (y_i >= 0 && y_i < COLS && !visitMatrix[x][y_i] && func(_array[x][y_i]) == func(type))
 		{
-			shipCollectChars(x, y_i, type, visitBoard, ship);
+			shipCollectChars(x, y_i, type, visitMatrix, func, g);
 		}
 	}
 
-
-	void GameData::shipCollectChars(unsigned int x, unsigned int y, unsigned int z, T type, visitMatrix, Func func) const {
+	template<typename G = T, typename Func, typename P>
+	void collectGroup(unsigned int x, unsigned int y, unsigned int z, P type, visitMatrix, Func func, Group<_DIMENSIONS>& g) const {
 		STATIC_ASSERT(DIMENSIONS == 3);
 		visitBoard[z][x][y] = true;
-		ship.addPointToTheList(x, y, z);
+		g.addPoint(new Point3D(x, y, z));
 		unsigned int x_i = x + 1;
-		if (x_i >= 0 && x_i < board->getRowSize() && !visitBoard[z][x_i][y] && func(matrix[x_i][y][z]) == type)
+		if (x_i >= 0 && x_i < board->getRowSize() && !visitMatrix[z][x_i][y] && func(_array[x_i][y][z]) == type)
 		{
-			shipCollectChars(x_i, y, z, shipChar, visitBoard, ship);
+			shipCollectChars(x_i, y, z, type, visitMatrix, func, g);
 		}
 		unsigned int y_i = y + 1;
-		if (y_i >= 0 && y_i < board->getColSize() && !visitBoard[z][x][y_i] && func(matrix[x][y_i][z] == type)
+		if (y_i >= 0 && y_i < board->getColSize() && !visitMatrix[z][x][y_i] && func(_array[x][y_i][z] == type)
 		{
-			shipCollectChars(x, y_i, z, shipChar, visitBoard, ship);
+			shipCollectChars(x, y_i, z, type, visitMatrix, func, g);
 		}
 		unsigned int z_i = z + 1;
-		if (z_i >= 0 && z_i < board->getDepthSize() && !visitBoard[z_i][x][y] && func(matrix[x][ y][z_i] == type)
+		if (z_i >= 0 && z_i < board->getDepthSize() && !visitMatrix[z_i][x][y] && func(_array[x][ y][z_i] == type)
 		{
-			shipCollectChars(x, y, z_i, shipChar, visitBoard, ship);
+			shipCollectChars(x, y, z_i, type, visitMatrix, func, g);
 		}
 		x_i = x - 1;
-		if (x_i >= 0 && x_i < board->getRowSize() && !visitBoard[z][x_i][y] && board->getCharAt(x_i, y, z) == shipChar)
+		if (x_i >= 0 && x_i < board->getRowSize() && !visitMatrix[z][x_i][y] && func(_array[x_i][y][z])== type)
 		{
-			shipCollectChars(x_i, y, z, shipChar, visitBoard, ship);
+			shipCollectChars(x_i, y, z, type, visitMatrix, func, g);
 		}
 		y_i = y - 1;
-		if (y_i >= 0 && y_i < board->getColSize() && !visitBoard[z][x][y_i] && board->getCharAt(x, y_i, z) == shipChar)
+		if (y_i >= 0 && y_i < board->getColSize() && !visitMatrix[z][x][y_i] && func(_array[x][y_i][z]) == type)
 		{
-			shipCollectChars(x, y_i, z, shipChar, visitBoard, ship);
+			shipCollectChars(x, y_i, z, type, visitMatrix, func, g);
 		}
 		z_i = z - 1;
-		if (z_i >= 0 && z_i < board->getDepthSize() && !visitBoard[z_i][x][y] && board->getCharAt(x, y, z_i) == shipChar)
+		if (z_i >= 0 && z_i < board->getDepthSize() && !visitMatrix[z_i][x][y] && func(_array[x][y][ z_i]) == type)
 		{
-			shipCollectChars(x, y, z_i, shipChar, visitBoard, ship);
+			collectGroup(x, y, z_i, type, visitMatrix, func, g);
 		}
 	}
 	
