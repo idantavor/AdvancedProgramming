@@ -14,8 +14,110 @@ using std::cout;
 using std::endl;
 using namespace std;
 
-template<class T, size_t DIMENSIONS>
-class Matrix;
+
+template<class T, size_t DIMENSIONS, class GroupingFunc, typename P, size_t DIM>
+struct MatrixGroupsCollector {
+	static void groupsCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>* types, GroupingFunc func) {
+		size_t dest_size0 = dest_size / dest_dimensions[0];
+		for (size_t i = 0; i < dest_dimensions[0]; ++i) {
+			MatrixGroupsCollector<T, DIMENSIONS - 1, P, GroupingFunc, DIM>::groupsCollect(dest + (i * dest_size0), dest_size0, dest_dimensions + 1, visit + (i * dest_size0), types,  func);
+		}
+	}
+};
+
+template<class T, class GroupingFunc, typename P, size_t DIM>
+struct MatrixGroupsCollector<T, 1, GroupingFunc, P, DIM> {
+	static void groupsCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>* types, GroupingFunc func){
+		for (size_t i = 0; i < dest_size; ++i) {
+			P type = func(dest[i]);
+			if (visit[i]) {
+				continue;
+			}
+			Group<DIM>* g = new Group<dim>();
+			MatrixGroupCollector<T, dim, GroupingFunc, P>::groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g);
+			<Func> collectGroup(depth, Row, column, type, visitArray, func, g);
+			bool typeNotExists = m.find(chck) == m.end();
+			if (typeNotExists) {
+				types[type] = std::list<Group<DIM>>(g);
+			}
+			else {
+				types[type].push_back(g);
+			}
+		}
+	}
+};
+
+template<class T, size_t DIMENSIONS, class GroupingFunc, typename P>
+struct MatrixGroupCollector {
+	static void groupCollect(T* dest, size_t dest_size, const size_t* dest_dimensionss, bool* visit , P type, GroupingFunc func, Group<DIMENSIONS>* g) {
+	}
+
+	/*
+	template<typename G = T, size_t DIM = DIMENSIONS, typename P>
+	void collectGroup(int x, int y, P type, std::unique_ptr<bool[]> visitArray, std::function<P(G)> func, Group<DIM>& g) const {
+		STATIC_ASSERT(DIM == 2);
+		visitBoard[x][y] = true;
+		g.addPoint(new Point2D(x, y));
+		int x_i = x + 1;
+		if (x_i >= 0 && x_i < ROWS && !visitArray[x_i][y] && func(_array[x_i][y]) == type)
+		{
+			collectGroup(x_i, y, type, visitArray, func, g);
+		}
+		int y_i = y + 1;
+		if (y_i >= 0 && y_i < COLS && !visitArray[x][y_i] && func(_array[x][y_i]) == type)
+		{
+			collectGroup(x, y_i, type, visitArray, func, g);
+		}
+		x_i = x - 1;
+		if (x_i >= 0 && x_i < ROWS && !visitArray[x_i][y] && func(_array[x_i][y]) == type)
+		{
+			collectGroup(x_i, y, type, visitArray, func, g);
+		}
+		y_i = y - 1;
+		if (y_i >= 0 && y_i < COLS && !visitArray[x][y_i] && func(_array[x][y_i]) == type)
+		{
+			collectGroup(x, y_i, type, visitArray, func, g);
+		}
+	}
+
+	template<typename G = T, size_t DIM = DIMENSIONS, typename P>
+	void collectGroup(unsigned int x, unsigned int y, unsigned int z, P type, std::unique_ptr<bool[]> visitArray, std::function<P(G)> func, Group<DIM>& g) const {
+		STATIC_ASSERT(DIM == 3);
+		visitBoard[z][x][y] = true;
+		g.addPoint(new Point3D(x, y, z));
+		unsigned int x_i = x + 1;
+		if (x_i >= 0 && x_i < board->getRowSize() && !visitArray[z][x_i][y] && func(_array[x_i][y][z]) == type)
+		{
+			collectGroup(x_i, y, z, type, visitArray, func, g);
+		}
+		unsigned int y_i = y + 1;
+		if (y_i >= 0 && y_i < board->getColSize() && !visitArray[z][x][y_i] && func(_array[x][y_i][z]) == type)
+		{
+			collectGroup(x, y_i, z, type, visitArray, func, g);
+		}
+		unsigned int z_i = z + 1;
+		if (z_i >= 0 && z_i < board->getDepthSize() && !visitArray[z_i][x][y] && func(_array[x][y][z_i]) == type)
+		{
+			collectGroup(x, y, z_i, type, visitArray, func, g);
+		}
+		x_i = x - 1;
+		if (x_i >= 0 && x_i < board->getRowSize() && !visitArray[z][x_i][y] && func(_array[x_i][y][z]) == type)
+		{
+			collectGroup(x_i, y, z, type, visitArray, func, g);
+		}
+		y_i = y - 1;
+		if (y_i >= 0 && y_i < board->getColSize() && !visitArray[z][x][y_i] && func(_array[x][y_i][z]) == type)
+		{
+			collectGroup(x, y_i, z, type, visitArray, func, g);
+		}
+		z_i = z - 1;
+		if (z_i >= 0 && z_i < board->getDepthSize() && !visitArray[z_i][x][y] && func(_array[x][y][z_i]) == type)
+		{
+			collectGroup(x, y, z_i, type, visitArray, func, g);
+		}
+	}
+	*/
+};
 
 template<class T, size_t DIMENSIONS>
 struct MatrixCopier {
@@ -165,130 +267,27 @@ public:
 		return out;
 	}
 
-	template< typename G = T, size_t DIM = DIMENSIONS, typename P>
-	std::map<P, std::list<Group<DIM>>> groupValues(std::function<P(G)> func) {
+	template< typename G = T, size_t DIM = DIMENSIONS, class GroupingFunc >
+	auto groupValues(GroupingFunc groupingFunc) {
 
+		using P = std::result_of_t<GroupingFunc(T&)>;
 		//Insilize visit board
+
+		size_t size = 1;
+		for (size_t dim = 0; dim < DIMENSIONS; ++dim) {
+			size *= _dimensions[dim];
+		}
+
 		std::unique_ptr<bool[]> visitArray = std::make_unique<bool[]>(_size); // "zero initialized" - T()
-		MatrixValueInitilaizer<T, bool, DIM>::valueInitilaize(&(visitArray[i * _size]), _array, _size, DIM, false);
+		//MatrixValueInitilaizer<T, bool, DIM>::valueInitilaize(&(visitArray[size]), _array, _size, DIM, false);
 
+		std::map < P, std::list<Group<DIM>>> types;
 
+		size_t i = 0;
+		size_t dest_size = _size / _dimensions[0];
+		MatrixGroupsCollector<G, DIM, GroupingFunc, P, DIM>::groupsCollect(&(_array[0]), dest_size, _dimensions + 1, &(visitArray[0]), &types, groupingFunc);
 
-		if (DIM == 2) {
-			//create boards and do checks
-			for (int row = 0; row < ROWS; row++) {
-				for (int column = 0; column < COLS; column++)
-				{
-					P type = func(_array[Row][column]);
-					if (visitArray[row][column]) {
-						continue;
-					}
-					Group<DIM> g();
-					<Func> collectGroup(row, column, type, visitArray, func, g);
-					bool typeNotExists = m.find(chck) == m.end();
-					if (typeNotExists) {
-						types[type] = std::list<Group<DIM>>(g);
-					}
-					else{
-						types[type].push_back(g);
-					}
-				}
-			}
-		}
-
-		else if (DIM == 3) {
-			//create boards and do checks
-			for (int depth = 0; row; row++) {
-				for (int row = 0; row < ROWS; row++) {
-					for (int column = 0; column < COLS; column++)
-					{
-						P type = func(_array[depth][Row][column]);
-						if (visitArray[depth][Row][column]) {
-							continue;
-						}
-						Group<DIM> g();
-						if (visitArray[depth][Row][column]) {
-							<Func> collectGroup(depth, Row, column, type, visitArray, func, g);
-							bool typeNotExists = m.find(chck) == m.end();
-							if (typeNotExists) {
-								types[type] = std::list<Group<DIM>>(g);
-							}
-							else {
-								types[type].push_back(g);
-							}
-
-						}
-					}
-				}
-			}
-
-		}
 		return types;
-	}
-
-
-	template<typename G = T, size_t DIM = DIMENSIONS, typename P>
-	void collectGroup(int x, int y , P type, std::unique_ptr<bool[]> visitArray, std::function<P(G)> func, Group<DIM>& g) const {
-		STATIC_ASSERT(DIM == 2);
-		visitBoard[x][y] = true;
-		g.addPoint(new Point2D(x, y));
-		int x_i = x + 1;
-		if (x_i >= 0 && x_i < ROWS && !visitArray[x_i][y] && func(_array[x_i][y]) == type)
-		{
-			collectGroup(x_i, y, type, visitArray, func, g);
-		}
-		int y_i = y + 1;
-		if (y_i >= 0 && y_i < COLS && !visitArray[x][y_i] && func(_array[x][y_i]) == type)
-		{
-			collectGroup(x, y_i, type, visitArray, func, g);
-		}
-		x_i = x - 1;
-		if (x_i >= 0 && x_i < ROWS && !visitArray[x_i][y] && func(_array[x_i][y]) == type)
-		{
-			collectGroup(x_i, y, type, visitArray, func, g);
-		}
-		y_i = y - 1;
-		if (y_i >= 0 && y_i < COLS && !visitArray[x][y_i] && func(_array[x][y_i]) == type)
-		{
-			collectGroup(x, y_i, type, visitArray, func, g);
-		}
-	}
-
-	template<typename G = T, size_t DIM = DIMENSIONS, typename P>
-	void collectGroup(unsigned int x, unsigned int y, unsigned int z, P type, std::unique_ptr<bool[]> visitArray, std::function<P(G)> func, Group<DIM>& g) const {
-		STATIC_ASSERT(DIM == 3);
-		visitBoard[z][x][y] = true;
-		g.addPoint(new Point3D(x, y, z));
-		unsigned int x_i = x + 1;
-		if (x_i >= 0 && x_i < board->getRowSize() && !visitArray[z][x_i][y] && func(_array[x_i][y][z]) == type)
-		{
-			collectGroup(x_i, y, z, type, visitArray, func, g);
-		}
-		unsigned int y_i = y + 1;
-		if (y_i >= 0 && y_i < board->getColSize() && !visitArray[z][x][y_i] && func(_array[x][y_i][z]) == type)
-		{
-			collectGroup(x, y_i, z, type, visitArray, func, g);
-		}
-		unsigned int z_i = z + 1;
-		if (z_i >= 0 && z_i < board->getDepthSize() && !visitArray[z_i][x][y] && func(_array[x][ y][z_i]) == type)
-		{
-			collectGroup(x, y, z_i, type, visitArray, func, g);
-		}
-		x_i = x - 1;
-		if (x_i >= 0 && x_i < board->getRowSize() && !visitArray[z][x_i][y] && func(_array[x_i][y][z])== type)
-		{
-			collectGroup(x_i, y, z, type, visitArray, func, g);
-		}
-		y_i = y - 1;
-		if (y_i >= 0 && y_i < board->getColSize() && !visitArray[z][x][y_i] && func(_array[x][y_i][z]) == type)
-		{
-			collectGroup(x, y_i, z, type, visitArray, func, g);
-		}
-		z_i = z - 1;
-		if (z_i >= 0 && z_i < board->getDepthSize() && !visitArray[z_i][x][y] && func(_array[x][y][ z_i]) == type)
-		{
-			collectGroup(x, y, z_i, type, visitArray, func, g);
-		}
 	}
 	
 };
