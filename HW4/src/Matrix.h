@@ -6,11 +6,13 @@
 #include <list>
 #include <map>
 #include <array>            // std::array
+#include <functional>
 
 #define STATIC_ASSERT( e ) static_assert( e, "!(" #e ")" )
 
 using std::cout;
 using std::endl;
+using namespace std;
 
 template<class T, size_t DIMENSIONS>
 class Matrix;
@@ -163,8 +165,8 @@ public:
 		return out;
 	}
 
-	template< typename G = T, size_t DIM = DIMENSIONS, typename Func, typename P>
-	std::map<P, std::list<Group<DIM>>> groupValues(Func func) {
+	template< typename G = T, size_t DIM = DIMENSIONS, typename P>
+	std::map<P, std::list<Group<DIM>>> groupValues(std::function<P(G)> func) {
 
 		//Insilize visit board
 		std::unique_ptr<bool[]> visitArray = std::make_unique<bool[]>(_size); // "zero initialized" - T()
@@ -200,7 +202,7 @@ public:
 				for (int row = 0; row < ROWS; row++) {
 					for (int column = 0; column < COLS; column++)
 					{
-						auto type = func(_array[depth][Row][column]);
+						P type = func(_array[depth][Row][column]);
 						if (visitArray[depth][Row][column]) {
 							continue;
 						}
@@ -225,8 +227,8 @@ public:
 	}
 
 
-	template<typename G = T, size_t DIM = DIMENSIONS, typename Func, typename P>
-	void collectGroup(int x, int y , P type, std::unique_ptr<bool[]> visitArray, Func func, Group<DIM>& g) const {
+	template<typename G = T, size_t DIM = DIMENSIONS, typename P>
+	void collectGroup(int x, int y , P type, std::unique_ptr<bool[]> visitArray, std::function<P(G)> func, Group<DIM>& g) const {
 		STATIC_ASSERT(DIM == 2);
 		visitBoard[x][y] = true;
 		g.addPoint(new Point2D(x, y));
@@ -252,8 +254,8 @@ public:
 		}
 	}
 
-	template<typename G = T, size_t DIM = DIMENSIONS, typename Func, typename P>
-	void collectGroup(unsigned int x, unsigned int y, unsigned int z, P type, std::unique_ptr<bool[]> visitArray, Func func, Group<DIM>& g) const {
+	template<typename G = T, size_t DIM = DIMENSIONS, typename P>
+	void collectGroup(unsigned int x, unsigned int y, unsigned int z, P type, std::unique_ptr<bool[]> visitArray, std::function<P(G)> func, Group<DIM>& g) const {
 		STATIC_ASSERT(DIM == 3);
 		visitBoard[z][x][y] = true;
 		g.addPoint(new Point3D(x, y, z));
