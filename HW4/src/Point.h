@@ -11,6 +11,7 @@ class Point
 private:
 	std::array< int, nDimensions > elements_;
 
+	/*
 	Point(std::initializer_list<int> pos)
 	{
 		int i = 0;
@@ -20,6 +21,7 @@ private:
 			i++;
 		}
 	}
+	*/
 
 public:
 	//int ValueType;
@@ -67,15 +69,15 @@ public:
 	}
 	//Point() : elements_() {}
 
+	/*
 	template < typename ...ArgsT>
 	Point(ArgsT ...pos)
 	{
 		Point({ pos... });
 	}
+	*/
 
 
-
-	/*
 	Point(int x, int y)
 	{
 		STATIC_ASSERT(nDimensions == 2);
@@ -90,12 +92,12 @@ public:
 		elements_[1] = y;
 		elements_[2] = z;
 	}
-	*/
+	
 };
-/*
 
-typedef Point< int, 2 > Point2D;
-typedef Point< int, 3 > Point3D;
-*/
+
+typedef Point< 2 > Point2D;
+typedef Point< 3 > Point3D;
+
 
 #endif //POINT_H_
