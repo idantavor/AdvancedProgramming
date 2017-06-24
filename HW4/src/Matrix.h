@@ -163,8 +163,8 @@ public:
 		return out;
 	}
 
-	template< typename G = T, size_t DIM = DIMENSIONS, typename Func>
-	std::map<auto, std::list<Group<DIM>>> groupValues(Func func) {
+	template< typename G = T, size_t DIM = DIMENSIONS, typename Func, typename P>
+	std::map<P, std::list<Group<DIM>>> groupValues(Func func) {
 
 		//Insilize visit board
 		std::unique_ptr<bool[]> visitArray = std::make_unique<bool[]>(_size); // "zero initialized" - T()
@@ -177,7 +177,7 @@ public:
 			for (int row = 0; row < ROWS; row++) {
 				for (int column = 0; column < COLS; column++)
 				{
-					auto type = func(_array[Row][column]);
+					P type = func(_array[Row][column]);
 					if (visitArray[row][column]) {
 						continue;
 					}
@@ -225,8 +225,8 @@ public:
 	}
 
 
-	template<typename G = T, size_t DIM = DIMENSIONS, typename Func>
-	void collectGroup(int x, int y , auto type, std::unique_ptr<bool[]> visitArray, Func func, Group<DIM>& g) const {
+	template<typename G = T, size_t DIM = DIMENSIONS, typename Func, typename P>
+	void collectGroup(int x, int y , P type, std::unique_ptr<bool[]> visitArray, Func func, Group<DIM>& g) const {
 		STATIC_ASSERT(DIM == 2);
 		visitBoard[x][y] = true;
 		g.addPoint(new Point2D(x, y));
