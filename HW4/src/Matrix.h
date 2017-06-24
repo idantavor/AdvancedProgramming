@@ -233,22 +233,22 @@ public:
 		int x_i = x + 1;
 		if (x_i >= 0 && x_i < ROWS && !visitArray[x_i][y] && func(_array[x_i][y]) == type)
 		{
-			shipCollectChars(x_i, y, type, visitArray, func, g);
+			collectGroup(x_i, y, type, visitArray, func, g);
 		}
 		int y_i = y + 1;
 		if (y_i >= 0 && y_i < COLS && !visitArray[x][y_i] && func(_array[x][y_i]) == type)
 		{
-			shipCollectChars(x, y_i, type, visitArray, func, g);
+			collectGroup(x, y_i, type, visitArray, func, g);
 		}
 		x_i = x - 1;
 		if (x_i >= 0 && x_i < ROWS && !visitArray[x_i][y] && func(_array[x_i][y]) == type)
 		{
-			shipCollectChars(x_i, y, type, visitArray, func, g);
+			collectGroup(x_i, y, type, visitArray, func, g);
 		}
 		y_i = y - 1;
 		if (y_i >= 0 && y_i < COLS && !visitArray[x][y_i] && func(_array[x][y_i]) == type)
 		{
-			shipCollectChars(x, y_i, type, visitArray, func, g);
+			collectGroup(x, y_i, type, visitArray, func, g);
 		}
 	}
 
@@ -260,27 +260,27 @@ public:
 		unsigned int x_i = x + 1;
 		if (x_i >= 0 && x_i < board->getRowSize() && !visitArray[z][x_i][y] && func(_array[x_i][y][z]) == type)
 		{
-			shipCollectChars(x_i, y, z, type, visitArray, func, g);
+			collectGroup(x_i, y, z, type, visitArray, func, g);
 		}
 		unsigned int y_i = y + 1;
 		if (y_i >= 0 && y_i < board->getColSize() && !visitArray[z][x][y_i] && func(_array[x][y_i][z]) == type)
 		{
-			shipCollectChars(x, y_i, z, type, visitArray, func, g);
+			collectGroup(x, y_i, z, type, visitArray, func, g);
 		}
 		unsigned int z_i = z + 1;
 		if (z_i >= 0 && z_i < board->getDepthSize() && !visitArray[z_i][x][y] && func(_array[x][ y][z_i]) == type)
 		{
-			shipCollectChars(x, y, z_i, type, visitArray, func, g);
+			collectGroup(x, y, z_i, type, visitArray, func, g);
 		}
 		x_i = x - 1;
 		if (x_i >= 0 && x_i < board->getRowSize() && !visitArray[z][x_i][y] && func(_array[x_i][y][z])== type)
 		{
-			shipCollectChars(x_i, y, z, type, visitArray, func, g);
+			collectGroup(x_i, y, z, type, visitArray, func, g);
 		}
 		y_i = y - 1;
 		if (y_i >= 0 && y_i < board->getColSize() && !visitArray[z][x][y_i] && func(_array[x][y_i][z]) == type)
 		{
-			shipCollectChars(x, y_i, z, type, visitArray, func, g);
+			collectGroup(x, y_i, z, type, visitArray, func, g);
 		}
 		z_i = z - 1;
 		if (z_i >= 0 && z_i < board->getDepthSize() && !visitArray[z_i][x][y] && func(_array[x][y][ z_i]) == type)
