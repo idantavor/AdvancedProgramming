@@ -20,7 +20,7 @@ struct MatrixGroupsCollector {
 	static void groupsCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>* types, GroupingFunc func) {
 		size_t dest_size0 = dest_size / dest_dimensions[0];
 		for (size_t i = 0; i < dest_dimensions[0]; ++i) {
-			MatrixGroupsCollector<T, DIMENSIONS - 1, P, GroupingFunc, DIM>::groupsCollect(dest + (i * dest_size0), dest_size0, dest_dimensions + 1, visit + (i * dest_size0), types,  func);
+			//MatrixGroupsCollector<T, DIMENSIONS - 1, P, GroupingFunc, DIM>::groupsCollect(dest + (i * dest_size0), dest_size0, dest_dimensions + 1, visit + (i * dest_size0), types,  func);
 		}
 	}
 };
@@ -141,10 +141,10 @@ struct MatrixCopier<T, 1> {
 
 template<class T, class G, size_t DIMENSIONS>
 struct MatrixValueInitilaizer {
-	static void valueInitilaize(G* dest, const T* source, size_t source_size, const size_t* source_dimensions, G value) {
+	static void valueInitilaize(G* dest, T* source, size_t source_size, const size_t* source_dimensions, G value) {
 		size_t size0 = source_size / source_dimensions[0];
 		for (size_t i = 0; i < source_dimensions[0]; ++i) {
-			MatrixValueInitilaizer<T, DIMENSIONS - 1>::valueInitilaize(dest + (i * size0), source + (i * size0), size0, source_dimensions + 1, value);
+			MatrixValueInitilaizer<T,G, DIMENSIONS - 1>::valueInitilaize(dest + (i * size0), source + (i * size0), size0, source_dimensions + 1, value);
 		}
 	}
 };
@@ -279,8 +279,10 @@ public:
 		}
 
 		std::unique_ptr<bool[]> visitArray = std::make_unique<bool[]>(_size); // "zero initialized" - T()
-		//MatrixValueInitilaizer<T, bool, DIM>::valueInitilaize(&(visitArray[size]), _array, _size, DIM, false);
-
+		//MatrixValueInitilaizer<T, bool, DIM>::valueInitilaize(&(visitArray[size]), _array.get(), _size, _dimensions, false);
+		for (int i = 0; i < size;i++) {
+			cout << visitArray.get()[i]  << " " ;
+		}
 		std::map < P, std::list<Group<DIM>>> types;
 
 		size_t i = 0;
