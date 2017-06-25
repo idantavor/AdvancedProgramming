@@ -14,53 +14,26 @@ using std::endl;
 using namespace std;
 
 
-template<class T, size_t DIMENSIONS, class GroupingFunc, typename P, size_t DIM>
-struct MatrixGroupsCollector {
-	static void groupsCollect(T* dest,  size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, int* point, int indexDim) {
-		size_t dest_size0 = dest_size / dest_dimensions[indexDim];
-		for (size_t i = 0; i < dest_dimensions[indexDim]; ++i) {
-			point[indexDim] = i;
-			MatrixGroupsCollector<T, DIMENSIONS - 1, GroupingFunc,P, DIM>::groupsCollect(T* dest, dest_size0, dest_dimensions, visit, types,  func, point, indexDim+1);
-		}
-	}
-};
-
-template<class T, class GroupingFunc, typename P, size_t DIM>
-struct MatrixGroupsCollector<T, 1, GroupingFunc, P, DIM> {
-	static void groupsCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, int* point, int indexDim){
-		for (size_t i = 0; i < dest_size; ++i) {
-			point[indexDim] = i;
-			P type = func(getItemFromMat(dest, dest_dimensions,point));
-			if (getItemFromMat(visit, dest_dimensions, point)) {
-				continue;
-			}
-			Group<DIM> g;
-			MatrixGroupCollector<T, DIM, GroupingFunc, P>::groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g);
-			types[type].push_back(g);
-		}
-	}
-};
-
 template<class T, class GroupingFunc, typename P, size_t DIM>
 struct MatrixGroupCollector {
-	static void groupCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, P type, GroupingFunc func, Group<DIMENSIONS>& g, int* point, int indexDim) {
-		getItemFromMat(visit, dest_dimensions, point) = true;
-		g.addPoint(new Point2D(x, y));
+	static void groupCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, P type, GroupingFunc func, Group<DIM>& g, size_t* point) {
+		ItemFromMat<bool, DIM>::getItemFromMat(visit, dest_dimensions, point) = true;
+		//g.addPoint(new Point2D(x, y));
 
-		for (int j = 0; j < DIMENSIONS; j++) {
-			int value = point[j];
+		for (size_t j = 0; j < DIM; j++) {
+			size_t value = point[j];
 
-			int newValue = value - 1;
-			if (newValue >= 0 && newValue < dest_dimensions[j] && !getItemFromMat(visit, dest_dimensions, point) && func(getItemFromMat(dest, dest_dimensions, point)) == type)
+			size_t newValue = value - 1;
+			if (newValue >= 0 && newValue < dest_dimensions[j] && !ItemFromMat<bool, DIM>::getItemFromMat(visit, dest_dimensions, point) && func(ItemFromMat<T, DIM>::getItemFromMat(dest, dest_dimensions, point)) == type)
 			{
 				point[j] = newValue;
-				groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point, indexDim);
+				groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point);
 			}
 			newValue = value + 1;
-			if (newValue >= 0 && newValue < dest_dimensions[j] && !getItemFromMat(visit, dest_dimensions, point) && func(getItemFromMat(dest, dest_dimensions, point)) == type)
+			if (newValue >= 0 && newValue < dest_dimensions[j] && !ItemFromMat<bool, DIM>::getItemFromMat(visit, dest_dimensions, point) && func(ItemFromMat<T, DIM>::getItemFromMat(dest, dest_dimensions, point)) == type)
 			{
 				point[j] = newValue;
-				groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point, indexDim);
+				groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point);
 			}
 
 			point[j] = value;
@@ -68,15 +41,47 @@ struct MatrixGroupCollector {
 	}
 };
 
-//get item in place (x,y,z,w ... ) according to arrayOfIndexes
-template<typename T, int DIM>
-T& getItemFromMat(T* mat, const size_t* dest_dimensions, int* arrayOfIndexes) {
-	index = 0;
-	for (int i = 0; i < DIM; i++) {
-		index += arrayOfIndexes[i] * dest_dimensionss[i]
+
+
+template<class T, size_t DIMENSIONS, class GroupingFunc, typename P, size_t DIM>
+struct MatrixGroupsCollector {
+	static void groupsCollect(T* dest,  size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, size_t* point, int indexDim) {
+		size_t dest_size0 = dest_size / dest_dimensions[indexDim];
+		for (size_t i = 0; i < dest_dimensions[indexDim]; ++i) {
+			point[indexDim] = i;
+			MatrixGroupsCollector<T, DIMENSIONS - 1, GroupingFunc,P, DIM>::groupsCollect(dest, dest_size0, dest_dimensions, visit, types,  func, point, indexDim+1);
+		}
 	}
-	return mat[index];
-}
+};
+
+template<class T, class GroupingFunc, typename P, size_t DIM>
+struct MatrixGroupsCollector<T, 1, GroupingFunc, P, DIM> {
+	static void groupsCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, size_t* point, int indexDim){
+		for (size_t i = 0; i < dest_size; ++i) {
+			point[indexDim] = i;
+			P type = func(ItemFromMat<T, DIM>::getItemFromMat(dest, dest_dimensions, point));
+			if (ItemFromMat<bool, DIM>::getItemFromMat(visit, dest_dimensions, point)) {
+				continue;
+			}
+			Group<DIM> g;
+			MatrixGroupCollector<T, GroupingFunc, P, DIM>::groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point);
+			types[type].push_back(g);
+		}
+	}
+};
+
+
+//get item in place (x,y,z,w ... ) according to arrayOfIndexes
+template<typename T, size_t DIM>
+struct ItemFromMat {
+	static T& getItemFromMat(T* mat, const size_t* dest_dimensions, size_t* arrayOfIndexes) {
+		size_t index = 0;
+		for (size_t i = 0; i < DIM; i++) {
+			index += arrayOfIndexes[i] * dest_dimensions[i];
+		}
+		return mat[index];
+	}
+};
 
 template<class T, size_t DIMENSIONS>
 struct MatrixCopier {
@@ -224,9 +229,10 @@ public:
 		}
 		std::map < P, std::list<Group<DIM>>> types;
 
+		std::unique_ptr<size_t[]> point = std::make_unique<size_t[]>(DIM);
 		size_t i = 0;
 		size_t dest_size = _size / _dimensions[0];
-		MatrixGroupsCollector<G, DIM, GroupingFunc, P, DIM>::groupsCollect(&(_array[0]), dest_size, _dimensions + 1, &(visitArray[0]), types, groupingFunc);
+		MatrixGroupsCollector<G, DIM, GroupingFunc, P, DIM>::groupsCollect(&(_array[0]), dest_size, _dimensions, &(visitArray[0]), types, groupingFunc, &(point[0]), 0);
 
 		return types;
 	}

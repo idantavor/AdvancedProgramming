@@ -77,4 +77,5 @@ public:
 	}
 	*/
 
+};
 #endif //POINT_H_
