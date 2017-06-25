@@ -77,27 +77,4 @@ public:
 	}
 	*/
 
-
-	Point(int x, int y)
-	{
-		STATIC_ASSERT(nDimensions == 2);
-		elements_[0] = x;
-		elements_[1] = y;
-	}
-
-	Point(int x, int y, int z)
-	{
-		STATIC_ASSERT(nDimensions == 3);
-		elements_[0] = x;
-		elements_[1] = y;
-		elements_[2] = z;
-	}
-	
-};
-
-
-typedef Point< 2 > Point2D;
-typedef Point< 3 > Point3D;
-
-
 #endif //POINT_H_

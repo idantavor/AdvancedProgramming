@@ -17,20 +17,22 @@ using namespace std;
 
 template<class T, size_t DIMENSIONS, class GroupingFunc, typename P, size_t DIM>
 struct MatrixGroupsCollector {
-	static void groupsCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func) {
-		size_t dest_size0 = dest_size / dest_dimensions[0];
-		for (size_t i = 0; i < dest_dimensions[0]; ++i) {
-			MatrixGroupsCollector<T, DIMENSIONS - 1, GroupingFunc,P, DIM>::groupsCollect(dest + (i * dest_size0), dest_size0, dest_dimensions + 1, visit + (i * dest_size0), types,  func);
+	static void groupsCollect(T* dest,  size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, int* point, int indexDim) {
+		size_t dest_size0 = dest_size / dest_dimensions[indexDim];
+		for (size_t i = 0; i < dest_dimensions[indexDim]; ++i) {
+			point[indexDim] = i;
+			MatrixGroupsCollector<T, DIMENSIONS - 1, GroupingFunc,P, DIM>::groupsCollect(T* dest, dest_size0, dest_dimensions, visit, types,  func, point, indexDim+1);
 		}
 	}
 };
 
 template<class T, class GroupingFunc, typename P, size_t DIM>
 struct MatrixGroupsCollector<T, 1, GroupingFunc, P, DIM> {
-	static void groupsCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func){
+	static void groupsCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, int* point, int indexDim){
 		for (size_t i = 0; i < dest_size; ++i) {
-			P type = func(dest[i]);
-			if (visit[i]) {
+			point[indexDim] = i;
+			P type = func(getItemFromMat(dest, dest_dimensions,point));
+			if (getItemFromMat(visit, dest_dimensions, point)) {
 				continue;
 			}
 			Group<DIM> g;
@@ -40,13 +42,72 @@ struct MatrixGroupsCollector<T, 1, GroupingFunc, P, DIM> {
 	}
 };
 
-template<class T, size_t DIMENSIONS, class GroupingFunc, typename P>
+template<class T, class GroupingFunc, typename P, size_t DIM>
 struct MatrixGroupCollector {
-	static void groupCollect(T* dest, size_t dest_size, const size_t* dest_dimensionss, bool* visit , P type, GroupingFunc func, Group<DIMENSIONS>& g) {
+	static void groupCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, P type, GroupingFunc func, Group<DIMENSIONS>& g, int* point, int indexDim) {
+		getItemFromMat(visit, dest_dimensions, point) = true;
+		g.addPoint(new Point2D(x, y));
+		for (int j = 0; j < DIMENSIONS; j++) {
+			int value = point[j];
 
+			int newValue = value - 1;
+			if (newValue >= 0 && newValue < dest_dimensions[indexDim] && !visit[x_i][y] && func(dest[x_i][y]) == type)
+			{
+				point[j] = newValue;
+				groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point, indexDim);
+			}
+			newValue = value + 1;
+			if (newValue >= 0 && newValue < dest_dimensions[indexDim] && !getItemFromMat(visit, dest_dimensions, point) && func(getItemFromMat(dest, dest_dimensions, point)) == type)
+			{
+				point[j] = newValue;
+				groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point, indexDim);
+			}
+
+			point[j] = value;
+		}
 	}
+};
 
-	/*
+template<typename T, int DIM>
+T& getItemFromMat(T* mat, size_t sizeOfMat, const size_t* dest_dimensionss, int* arrayOfIndexes) {
+
+}
+
+
+
+/*
+template<class T, size_t DIMENSIONS, class GroupingFunc, typename P, size_t DIM>
+struct MatrixGroupsCollector {
+	static void groupsCollect(T* dest, T* destChange, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, int* point, int indexDim) {
+	size_t dest_size0 = dest_size / dest_dimensions[indexDim];
+	for (size_t i = 0; i < dest_dimensions[indexDim]; ++i) {
+	point[indexDim] = i;
+	MatrixGroupsCollector<T, DIMENSIONS - 1, GroupingFunc,P, DIM>::groupsCollect(destChange + (i * dest_size0), dest_size0, dest_dimensions, visit + (i * dest_size0), types,  func, point, indexDim+1);
+	}
+	}
+};
+
+
+/*
+template<class T, class GroupingFunc, typename P, size_t DIM>
+struct MatrixGroupsCollector<T, 1, GroupingFunc, P, DIM> {
+static void groupsCollect(T* dest, T* destChange, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, int* point, int indexDim){
+for (size_t i = 0; i < dest_size; ++i) {
+P type = func(destChange[i]);
+if (visit[i]) {
+continue;
+}
+Group<DIM> g;
+MatrixGroupCollector<T, DIM, GroupingFunc, P>::groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g);
+types[type].push_back(g);
+}
+}
+};
+
+
+template<class T, size_t DIMENSIONS, class GroupingFunc, typename P>
+
+
 	template<typename G = T, size_t DIM = DIMENSIONS, typename P>
 	void collectGroup(int x, int y, P type, std::unique_ptr<bool[]> visitArray, std::function<P(G)> func, Group<DIM>& g) const {
 		STATIC_ASSERT(DIM == 2);
