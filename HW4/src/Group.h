@@ -35,8 +35,6 @@ private:
 		positionList.push_back(p);
 	}
 
-
 };
-
 
 #endif 

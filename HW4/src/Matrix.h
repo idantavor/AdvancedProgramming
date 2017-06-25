@@ -10,7 +10,6 @@
 
 #define STATIC_ASSERT( e ) static_assert( e, "!(" #e ")" )
 
-using std::cout;
 using std::endl;
 using namespace std;
 
@@ -47,17 +46,18 @@ struct MatrixGroupCollector {
 	static void groupCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, P type, GroupingFunc func, Group<DIMENSIONS>& g, int* point, int indexDim) {
 		getItemFromMat(visit, dest_dimensions, point) = true;
 		g.addPoint(new Point2D(x, y));
+
 		for (int j = 0; j < DIMENSIONS; j++) {
 			int value = point[j];
 
 			int newValue = value - 1;
-			if (newValue >= 0 && newValue < dest_dimensions[indexDim] && !visit[x_i][y] && func(dest[x_i][y]) == type)
+			if (newValue >= 0 && newValue < dest_dimensions[j] && !getItemFromMat(visit, dest_dimensions, point) && func(getItemFromMat(dest, dest_dimensions, point)) == type)
 			{
 				point[j] = newValue;
 				groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point, indexDim);
 			}
 			newValue = value + 1;
-			if (newValue >= 0 && newValue < dest_dimensions[indexDim] && !getItemFromMat(visit, dest_dimensions, point) && func(getItemFromMat(dest, dest_dimensions, point)) == type)
+			if (newValue >= 0 && newValue < dest_dimensions[j] && !getItemFromMat(visit, dest_dimensions, point) && func(getItemFromMat(dest, dest_dimensions, point)) == type)
 			{
 				point[j] = newValue;
 				groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point, indexDim);
@@ -68,111 +68,15 @@ struct MatrixGroupCollector {
 	}
 };
 
+//get item in place (x,y,z,w ... ) according to arrayOfIndexes
 template<typename T, int DIM>
-T& getItemFromMat(T* mat, size_t sizeOfMat, const size_t* dest_dimensionss, int* arrayOfIndexes) {
-
-}
-
-
-
-/*
-template<class T, size_t DIMENSIONS, class GroupingFunc, typename P, size_t DIM>
-struct MatrixGroupsCollector {
-	static void groupsCollect(T* dest, T* destChange, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, int* point, int indexDim) {
-	size_t dest_size0 = dest_size / dest_dimensions[indexDim];
-	for (size_t i = 0; i < dest_dimensions[indexDim]; ++i) {
-	point[indexDim] = i;
-	MatrixGroupsCollector<T, DIMENSIONS - 1, GroupingFunc,P, DIM>::groupsCollect(destChange + (i * dest_size0), dest_size0, dest_dimensions, visit + (i * dest_size0), types,  func, point, indexDim+1);
+T& getItemFromMat(T* mat, const size_t* dest_dimensions, int* arrayOfIndexes) {
+	index = 0;
+	for (int i = 0; i < DIM; i++) {
+		index += arrayOfIndexes[i] * dest_dimensionss[i]
 	}
-	}
-};
-
-
-/*
-template<class T, class GroupingFunc, typename P, size_t DIM>
-struct MatrixGroupsCollector<T, 1, GroupingFunc, P, DIM> {
-static void groupsCollect(T* dest, T* destChange, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, int* point, int indexDim){
-for (size_t i = 0; i < dest_size; ++i) {
-P type = func(destChange[i]);
-if (visit[i]) {
-continue;
+	return mat[index];
 }
-Group<DIM> g;
-MatrixGroupCollector<T, DIM, GroupingFunc, P>::groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g);
-types[type].push_back(g);
-}
-}
-};
-
-
-template<class T, size_t DIMENSIONS, class GroupingFunc, typename P>
-
-
-	template<typename G = T, size_t DIM = DIMENSIONS, typename P>
-	void collectGroup(int x, int y, P type, std::unique_ptr<bool[]> visitArray, std::function<P(G)> func, Group<DIM>& g) const {
-		STATIC_ASSERT(DIM == 2);
-		visitBoard[x][y] = true;
-		g.addPoint(new Point2D(x, y));
-		int x_i = x + 1;
-		if (x_i >= 0 && x_i < ROWS && !visitArray[x_i][y] && func(_array[x_i][y]) == type)
-		{
-			collectGroup(x_i, y, type, visitArray, func, g);
-		}
-		int y_i = y + 1;
-		if (y_i >= 0 && y_i < COLS && !visitArray[x][y_i] && func(_array[x][y_i]) == type)
-		{
-			collectGroup(x, y_i, type, visitArray, func, g);
-		}
-		x_i = x - 1;
-		if (x_i >= 0 && x_i < ROWS && !visitArray[x_i][y] && func(_array[x_i][y]) == type)
-		{
-			collectGroup(x_i, y, type, visitArray, func, g);
-		}
-		y_i = y - 1;
-		if (y_i >= 0 && y_i < COLS && !visitArray[x][y_i] && func(_array[x][y_i]) == type)
-		{
-			collectGroup(x, y_i, type, visitArray, func, g);
-		}
-	}
-
-	template<typename G = T, size_t DIM = DIMENSIONS, typename P>
-	void collectGroup(unsigned int x, unsigned int y, unsigned int z, P type, std::unique_ptr<bool[]> visitArray, std::function<P(G)> func, Group<DIM>& g) const {
-		STATIC_ASSERT(DIM == 3);
-		visitBoard[z][x][y] = true;
-		g.addPoint(new Point3D(x, y, z));
-		unsigned int x_i = x + 1;
-		if (x_i >= 0 && x_i < board->getRowSize() && !visitArray[z][x_i][y] && func(_array[x_i][y][z]) == type)
-		{
-			collectGroup(x_i, y, z, type, visitArray, func, g);
-		}
-		unsigned int y_i = y + 1;
-		if (y_i >= 0 && y_i < board->getColSize() && !visitArray[z][x][y_i] && func(_array[x][y_i][z]) == type)
-		{
-			collectGroup(x, y_i, z, type, visitArray, func, g);
-		}
-		unsigned int z_i = z + 1;
-		if (z_i >= 0 && z_i < board->getDepthSize() && !visitArray[z_i][x][y] && func(_array[x][y][z_i]) == type)
-		{
-			collectGroup(x, y, z_i, type, visitArray, func, g);
-		}
-		x_i = x - 1;
-		if (x_i >= 0 && x_i < board->getRowSize() && !visitArray[z][x_i][y] && func(_array[x_i][y][z]) == type)
-		{
-			collectGroup(x_i, y, z, type, visitArray, func, g);
-		}
-		y_i = y - 1;
-		if (y_i >= 0 && y_i < board->getColSize() && !visitArray[z][x][y_i] && func(_array[x][y_i][z]) == type)
-		{
-			collectGroup(x, y_i, z, type, visitArray, func, g);
-		}
-		z_i = z - 1;
-		if (z_i >= 0 && z_i < board->getDepthSize() && !visitArray[z_i][x][y] && func(_array[x][y][z_i]) == type)
-		{
-			collectGroup(x, y, z_i, type, visitArray, func, g);
-		}
-	}
-	*/
-};
 
 template<class T, size_t DIMENSIONS>
 struct MatrixCopier {
