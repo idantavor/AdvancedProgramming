@@ -23,6 +23,7 @@ private:
 		return true;
 	}
 
+public:
 	void sortGroup() {
 		positionList.sort(comparePoints);
 	}
@@ -34,7 +35,6 @@ private:
 	void addPoint(Point<nDimensions> p) {
 		positionList.push_back(p);
 	}
-
 };
 
 #endif 

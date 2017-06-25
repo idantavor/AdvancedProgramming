@@ -1,69 +1,78 @@
 
 #include <iostream>
-#include "Point.h"
 #include <memory>
-#include "Group.h"
 #include <list>
 #include <map>
 #include <array>            // std::array
 #include <functional>
 
-#define STATIC_ASSERT( e ) static_assert( e, "!(" #e ")" )
 
 using std::endl;
 using namespace std;
 
 
-template<class T, class GroupingFunc, typename P, size_t DIM>
+template<class T, class GroupingFunc, typename P, int DIM>
 struct MatrixGroupCollector {
-	static void groupCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, P type, GroupingFunc func, Group<DIM>& g, size_t* point) {
+
+	static void groupCollect(T* dest, int dest_size, const int* dest_dimensions, bool* visit, P type, GroupingFunc func, std::list<std::list<int>>& g , int* point) {
 		ItemFromMat<bool, DIM>::getItemFromMat(visit, dest_dimensions, point) = true;
-		//g.addPoint(new Point2D(x, y));
-
-		for (size_t j = 0; j < DIM; j++) {
-			size_t value = point[j];
-
-			size_t newValue = value - 1;
+		//for (int i = 0; i < 24; i++) { cout << visit[i] << ' '; }
+		//cout << endl;
+		std::list<int> newPoint;
+		getPoint(point, newPoint, DIM);
+		g.push_back(newPoint);
+		for (int j = DIM; j >= 0; j--) {
+			int value = point[j];
+			int newValue = value - 1;
+			point[j] = newValue;
 			if (newValue >= 0 && newValue < dest_dimensions[j] && !ItemFromMat<bool, DIM>::getItemFromMat(visit, dest_dimensions, point) && func(ItemFromMat<T, DIM>::getItemFromMat(dest, dest_dimensions, point)) == type)
 			{
-				point[j] = newValue;
 				groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point);
 			}
 			newValue = value + 1;
+			point[j] = newValue;
 			if (newValue >= 0 && newValue < dest_dimensions[j] && !ItemFromMat<bool, DIM>::getItemFromMat(visit, dest_dimensions, point) && func(ItemFromMat<T, DIM>::getItemFromMat(dest, dest_dimensions, point)) == type)
 			{
-				point[j] = newValue;
 				groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point);
 			}
 
 			point[j] = value;
 		}
 	}
+
+	static void getPoint(int* pos, std::list<int>& point, int dim)
+	{
+		for (int i = 0; i<dim; i++) {
+			point.push_back(pos[i]);
+		}
+	}
 };
 
 
 
-template<class T, size_t DIMENSIONS, class GroupingFunc, typename P, size_t DIM>
+template<class T, int DIMENSIONS, class GroupingFunc, typename P, int DIM>
 struct MatrixGroupsCollector {
-	static void groupsCollect(T* dest,  size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, size_t* point, int indexDim) {
-		size_t dest_size0 = dest_size / dest_dimensions[indexDim];
-		for (size_t i = 0; i < dest_dimensions[indexDim]; ++i) {
+	static void groupsCollect(T* dest,  int dest_size, const int* dest_dimensions, bool* visit, std::map < P, std::list<list<list<int>>>> &types, GroupingFunc func, int* point, int indexDim) {
+		int dest_size0 = dest_size / dest_dimensions[indexDim];
+		for (int i = 0; i < dest_dimensions[indexDim]; ++i) {
 			point[indexDim] = i;
 			MatrixGroupsCollector<T, DIMENSIONS - 1, GroupingFunc,P, DIM>::groupsCollect(dest, dest_size0, dest_dimensions, visit, types,  func, point, indexDim+1);
 		}
 	}
 };
 
-template<class T, class GroupingFunc, typename P, size_t DIM>
+template<class T, class GroupingFunc, typename P, int DIM>
 struct MatrixGroupsCollector<T, 1, GroupingFunc, P, DIM> {
-	static void groupsCollect(T* dest, size_t dest_size, const size_t* dest_dimensions, bool* visit, std::map < P, std::list<Group<DIM>>>& types, GroupingFunc func, size_t* point, int indexDim){
-		for (size_t i = 0; i < dest_size; ++i) {
+	static void groupsCollect(T* dest, int dest_size, const int* dest_dimensions, bool* visit, std::map < P, std::list<list<list<int>>>>& types, GroupingFunc func, int* point, int indexDim){
+		for (int i = 0; i < dest_size; ++i) {
 			point[indexDim] = i;
+
 			P type = func(ItemFromMat<T, DIM>::getItemFromMat(dest, dest_dimensions, point));
 			if (ItemFromMat<bool, DIM>::getItemFromMat(visit, dest_dimensions, point)) {
 				continue;
 			}
-			Group<DIM> g;
+			std::list<std::list<int>> g;
+			//Group<DIM> g;
 			MatrixGroupCollector<T, GroupingFunc, P, DIM>::groupCollect(dest, dest_size, dest_dimensions, visit, type, func, g, point);
 			types[type].push_back(g);
 		}
@@ -72,23 +81,27 @@ struct MatrixGroupsCollector<T, 1, GroupingFunc, P, DIM> {
 
 
 //get item in place (x,y,z,w ... ) according to arrayOfIndexes
-template<typename T, size_t DIM>
+template<typename T, int DIM>
 struct ItemFromMat {
-	static T& getItemFromMat(T* mat, const size_t* dest_dimensions, size_t* arrayOfIndexes) {
-		size_t index = 0;
-		for (size_t i = 0; i < DIM; i++) {
-			index += arrayOfIndexes[i] * dest_dimensions[i];
+	static T& getItemFromMat(T* mat, const int* dest_dimensions, int* arrayOfIndexes) {
+		int index = 0;
+		int mult = 1;
+		for (int j = 0; j < DIM; j++)mult *= dest_dimensions[j];
+		for (int i = 0; i < DIM-1; i++) {
+			mult = mult / dest_dimensions[i];
+			index += arrayOfIndexes[i]*mult;
 		}
+		index += arrayOfIndexes[DIM - 1];
 		return mat[index];
 	}
 };
 
-template<class T, size_t DIMENSIONS>
+template<class T, int DIMENSIONS>
 struct MatrixCopier {
-	static void copy(T* dest, size_t dest_size, const size_t* dest_dimensions, const T* source, size_t source_size, const size_t* source_dimensions) {
-		size_t dest_size0 = dest_size / dest_dimensions[0];
-		size_t source_size0 = source_size / source_dimensions[0];
-		for (size_t i = 0; i < source_dimensions[0]; ++i) {
+	static void copy(T* dest, int dest_size, const int* dest_dimensions, const T* source, int source_size, const int* source_dimensions) {
+		int dest_size0 = dest_size / dest_dimensions[0];
+		int source_size0 = source_size / source_dimensions[0];
+		for (int i = 0; i < source_dimensions[0]; ++i) {
 			MatrixCopier<T, DIMENSIONS - 1>::copy(dest + (i * dest_size0), dest_size0, dest_dimensions + 1, source + (i * source_size0), source_size0, source_dimensions + 1);
 		}
 	}
@@ -96,21 +109,21 @@ struct MatrixCopier {
 
 template<class T>
 struct MatrixCopier<T, 1> {
-	static void copy(T* dest, size_t dest_size, const size_t* dest_dimensions, const T* source, size_t source_size, const size_t* source_dimensions) {
-		for (size_t i = 0; i < source_size; ++i) {
+	static void copy(T* dest, int dest_size, const int* dest_dimensions, const T* source, int source_size, const int* source_dimensions) {
+		for (int i = 0; i < source_size; ++i) {
 			dest[i] = source[i];
 		}
 	}
 };
 
 
-template<class T, size_t DIMENSIONS>
+template<class T, int DIMENSIONS>
 struct MatrixPrinter {
-	static void print(const T* values, size_t size, const size_t* dimensions, std::ostream& out = cout) {
+	static void print(const T* values, int size, const int* dimensions, std::ostream& out = cout) {
 		out << '{';
-		size_t size0 = size / dimensions[0];
+		int size0 = size / dimensions[0];
 		MatrixPrinter<T, DIMENSIONS - 1>::print(values, size0, dimensions + 1, out);
-		for (size_t i = 1; i < dimensions[0]; ++i) {
+		for (int i = 1; i < dimensions[0]; ++i) {
 			out << ',';
 			MatrixPrinter<T, DIMENSIONS - 1>::print(values + (i*size0), size0, dimensions + 1, out);
 		}
@@ -120,25 +133,25 @@ struct MatrixPrinter {
 
 template<class T>
 struct MatrixPrinter<T, 1> {
-	static void print(const T* values, size_t size, const size_t* dimensions, std::ostream& out = cout) {
+	static void print(const T* values, int size, const int* dimensions, std::ostream& out = cout) {
 		out << '{';
 		out << values[0];
-		for (size_t i = 1; i < size; ++i) {
+		for (int i = 1; i < size; ++i) {
 			out << ',' << values[i];
 		}
 		out << '}';
 	}
 };
 
-template<class T, size_t DIMENSIONS>
+template<class T, int DIMENSIONS>
 class Matrix {
-	constexpr static size_t NUM_DIMENSIONS = DIMENSIONS;
+	constexpr static int NUM_DIMENSIONS = DIMENSIONS;
 	std::unique_ptr<T[]> _array = nullptr;
-	size_t _dimensions[DIMENSIONS] = {};
-	const size_t _size = 0;
+	int _dimensions[DIMENSIONS] = {};
+	const int _size = 0;
 	friend class Matrix<T, DIMENSIONS + 1>;
 public:
-	size_t size() const { return _size; }
+	int size() const { return _size; }
 	Matrix() {}
 
 	// DIMENSIONS == 1
@@ -148,10 +161,10 @@ public:
 	// The SFINAE results with the exact signature we want, but only for cases DIMENSIONS == 1
 	template<typename G = T>
 	Matrix(const std::initializer_list<typename std::enable_if_t<DIMENSIONS == 1, G>>& values) {
-		const_cast<size_t&>(_size) = values.size();
+		const_cast<int&>(_size) = static_cast<int>(values.size());
 		_dimensions[0] = _size;
 		_array = std::make_unique<T[]>(_size);
-		size_t i = 0;
+		int i = 0;
 		for (auto& val : values) {
 			_array[i++] = val;
 		}
@@ -168,23 +181,23 @@ public:
 	// The SFINAE results with the exact signature we want, but only for cases DIMENSIONS > 1
 	template<typename G = T>
 	Matrix(const std::initializer_list<Matrix<typename std::enable_if_t<(DIMENSIONS > 1), G>, DIMENSIONS - 1>>& values) {
-		_dimensions[0] = values.size();
+		_dimensions[0] = static_cast<int>(values.size());
 		for (auto& m : values) {
-			for (size_t dim = 0; dim < DIMENSIONS - 1; ++dim) {
+			for (int dim = 0; dim < DIMENSIONS - 1; ++dim) {
 				if (m._dimensions[dim] > _dimensions[dim + 1]) {
 					_dimensions[dim + 1] = m._dimensions[dim];
 				}
 			}
 		}
-		size_t size = 1;
-		for (size_t dim = 0; dim < DIMENSIONS; ++dim) {
+		int size = 1;
+		for (int dim = 0; dim < DIMENSIONS; ++dim) {
 			size *= _dimensions[dim];
 		}
 
-		const_cast<size_t&>(_size) = size;
+		const_cast<int&>(_size) = size;
 		_array = std::make_unique<T[]>(_size); // "zero initialized" - T()
-		size_t i = 0;
-		size_t dest_size = _size / _dimensions[0];
+		int i = 0;
+		int dest_size = _size / _dimensions[0];
 		for (auto& m : values) {
 			MatrixCopier<T, DIMENSIONS - 1>::copy(&(_array[i * dest_size]), dest_size, _dimensions + 1, m._array.get(), m._size, m._dimensions);
 			++i;
@@ -197,12 +210,12 @@ public:
 
 	auto& operator=(Matrix&& m) {
 		std::swap(_array, m._array);
-		std::swap(const_cast<size_t&>(_size), const_cast<size_t&>(m._size));
+		std::swap(const_cast<int&>(_size), const_cast<int&>(m._size));
 		std::swap(_dimensions, m._dimensions);
 		return *this;
 	}
 
-	size_t getDimension(size_t i) const {
+	int getDimension(int i) const {
 		return _dimensions[i];
 	}
 
@@ -211,29 +224,22 @@ public:
 		return out;
 	}
 
-	template< typename G = T, size_t DIM = DIMENSIONS, class GroupingFunc >
+	template< typename G = T, int DIM = DIMENSIONS, class GroupingFunc >
 	auto groupValues(GroupingFunc groupingFunc) {
 
 		using P = std::result_of_t<GroupingFunc(T&)>;
 		//Insilize visit board
 
-		size_t size = 1;
-		for (size_t dim = 0; dim < DIMENSIONS; ++dim) {
+		int size = 1;
+		for (int dim = 0; dim < DIMENSIONS; ++dim) {
 			size *= _dimensions[dim];
 		}
-
 		std::unique_ptr<bool[]> visitArray = std::make_unique<bool[]>(_size); // "zero initialized" - T()
 		//MatrixValueInitilaizer<T, bool, DIM>::valueInitilaize(&(visitArray[size]), _array.get(), _size, _dimensions, false);
-		for (int i = 0; i < size;i++) {
-			cout << visitArray.get()[i]  << " " ;
-		}
-		std::map < P, std::list<Group<DIM>>> types;
+		std::map < P, std::list<list<list<int>>>> types;
 
-		std::unique_ptr<size_t[]> point = std::make_unique<size_t[]>(DIM);
-		size_t i = 0;
-		size_t dest_size = _size / _dimensions[0];
-		MatrixGroupsCollector<G, DIM, GroupingFunc, P, DIM>::groupsCollect(&(_array[0]), dest_size, _dimensions, &(visitArray[0]), types, groupingFunc, &(point[0]), 0);
-
+		std::unique_ptr<int[]> point = std::make_unique<int[]>(DIM);
+		MatrixGroupsCollector<G, DIM, GroupingFunc, P, DIM>::groupsCollect(&(_array[0]), _size, _dimensions, &(visitArray[0]), types, groupingFunc, &(point[0]), 0);
 		return types;
 	}
 	

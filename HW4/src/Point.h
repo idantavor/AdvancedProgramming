@@ -11,17 +11,6 @@ class Point
 private:
 	std::array< int, nDimensions > elements_;
 
-	/*
-	Point(std::initializer_list<int> pos)
-	{
-		int i = 0;
-		for (auto elem : pos)
-		{
-			elements_[i] = elem;
-			i++;
-		}
-	}
-	*/
 
 public:
 	//int ValueType;
@@ -52,6 +41,10 @@ public:
 		}
 	}
 
+	std::array< int, nDimensions > getElements() {
+		return elements_;
+	}
+
 	friend Point operator+(Point const& a, Point const& b)
 	{
 		Point ret(a);
@@ -67,15 +60,13 @@ public:
 		ret -= b;
 		return ret;
 	}
-	//Point() : elements_() {}
 
-	/*
-	template < typename ...ArgsT>
-	Point(ArgsT ...pos)
+	Point(int* pos)
 	{
-		Point({ pos... });
+		for(int i=0; i<nDimensions; i++){
+			elements_[i] = pos[i];
+		}
 	}
-	*/
 
 };
 #endif //POINT_H_
